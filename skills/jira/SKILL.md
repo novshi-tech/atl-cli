@@ -124,9 +124,25 @@ atl jira sprint issues --sprint 100
 
 ## 共通フラグ
 
-すべての jira サブコマンドで以下のフラグが使用可能:
+すべてのサブコマンドで以下のフラグが使用可能:
 
+- `--json` - 機械可読な JSON 形式で出力する（AI エージェント連携に推奨）
 - `--site` - 使用するサイトエイリアス（未指定時はデフォルトサイト）
+
+### `--json` フラグ
+
+`--json` を付けるとすべてのコマンドが構造化 JSON を出力する。AI エージェントから呼び出す場合は常に `--json` を使用すること。
+
+```bash
+# 課題一覧を JSON で取得
+atl jira issue list --project PROJ --json
+
+# 課題の詳細を JSON で取得
+atl jira issue view --key PROJ-123 --json
+
+# 課題を作成して結果を JSON で取得
+atl jira issue create --project PROJ --summary "タスク" --json
+```
 
 ## Resources
 

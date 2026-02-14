@@ -15,11 +15,20 @@ atl jira issue create [flags]
 | `--type` | `-t` | No | `Task` | 課題タイプ（Task, Bug, Story, Epic 等） |
 | `--description` | `-d` | No | - | 課題の説明 |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
 
 **出力例:**
 ```
 Created issue: PROJ-456
 URL: https://example.atlassian.net/browse/PROJ-456
+```
+
+**JSON 出力例** (`--json`):
+```json
+{
+  "key": "PROJ-456",
+  "url": "https://example.atlassian.net/browse/PROJ-456"
+}
 ```
 
 ## jira issue list
@@ -38,6 +47,7 @@ atl jira issue list [flags]
 | `--assignee` | - | No | - | アサイニーでフィルタ（`me` で自分） |
 | `--max` | - | No | `50` | 最大取得件数 |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
 
 **出力例:**
 ```
@@ -46,6 +56,19 @@ Found 3 issue(s):
 PROJ-123      In Progress      John Doe              ログイン画面のバグ修正
 PROJ-124      To Do            Unassigned            新機能の設計
 PROJ-125      Done             Jane Smith            API ドキュメント更新
+```
+
+**JSON 出力例** (`--json`):
+```json
+[
+  {
+    "key": "PROJ-123",
+    "summary": "ログイン画面のバグ修正",
+    "status": "In Progress",
+    "type": "Bug",
+    "assignee": "John Doe"
+  }
+]
 ```
 
 ## jira issue view
@@ -60,6 +83,7 @@ atl jira issue view [flags]
 |--------|------|------|-----------|------|
 | `--key` | `-k` | Yes | - | 課題キー |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
 
 **出力例:**
 ```
@@ -79,6 +103,26 @@ URL:       https://example.atlassian.net/browse/PROJ-123
 修正方針を確認しました。
 ```
 
+**JSON 出力例** (`--json`):
+```json
+{
+  "key": "PROJ-123",
+  "summary": "ログイン画面のバグ修正",
+  "status": "In Progress",
+  "type": "Bug",
+  "assignee": "John Doe",
+  "url": "https://example.atlassian.net/browse/PROJ-123",
+  "description": "ログイン画面でエラーが発生する問題を修正する。",
+  "comments": [
+    {
+      "author": "Jane Smith",
+      "created": "2024-01-15T10:30:00.000+0000",
+      "body": "修正方針を確認しました。"
+    }
+  ]
+}
+```
+
 ## jira issue update
 
 既存の課題を更新する。`--summary`、`--description`、`--status` のいずれかを指定する。
@@ -94,6 +138,7 @@ atl jira issue update [flags]
 | `--description` | `-d` | No | - | 新しい説明 |
 | `--status` | - | No | - | 遷移先ステータス |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
 
 ## jira issue comment
 
@@ -108,6 +153,7 @@ atl jira issue comment [flags]
 | `--key` | `-k` | Yes | - | 課題キー |
 | `--body` | `-b` | Yes | - | コメント本文 |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
 
 ## jira sprint list
 
@@ -122,11 +168,23 @@ atl jira sprint list [flags]
 | `--board` | - | Yes | - | ボード ID |
 | `--state` | - | No | - | 状態フィルタ（`active` / `closed` / `future`） |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
 
 **出力例:**
 ```
 42      active      Sprint 10
 43      future      Sprint 11
+```
+
+**JSON 出力例** (`--json`):
+```json
+[
+  {
+    "id": 42,
+    "name": "Sprint 10",
+    "state": "active"
+  }
+]
 ```
 
 ## jira sprint issues
@@ -141,6 +199,7 @@ atl jira sprint issues [flags]
 |--------|------|------|-----------|------|
 | `--sprint` | - | Yes | - | スプリント ID |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
 
 ## configure
 
@@ -157,5 +216,19 @@ atl configure --site <alias>
 設定済みサイトの一覧を表示する。
 
 ```
-atl sites
+atl sites [flags]
+```
+
+| フラグ | 短縮 | 必須 | デフォルト | 説明 |
+|--------|------|------|-----------|------|
+| `--json` | - | No | `false` | JSON 形式で出力 |
+
+**JSON 出力例** (`--json`):
+```json
+[
+  {
+    "name": "mysite",
+    "default": true
+  }
+]
 ```
