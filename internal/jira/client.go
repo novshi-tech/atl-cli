@@ -110,7 +110,7 @@ func (c *Client) AddComment(key, body string) error {
 
 // SearchIssues searches for issues using JQL.
 func (c *Client) SearchIssues(jql string, maxResults int) (*SearchResponse, error) {
-	path := fmt.Sprintf("/rest/api/3/search?jql=%s&maxResults=%d&fields=summary,status,issuetype,assignee",
+	path := fmt.Sprintf("/rest/api/3/search/jql?jql=%s&maxResults=%d&fields=summary,status,issuetype,assignee",
 		urlEncode(jql), maxResults)
 	var resp SearchResponse
 	if err := c.doRequest("GET", path, nil, &resp); err != nil {

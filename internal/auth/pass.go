@@ -23,11 +23,10 @@ func NewPassStore() (*PassStore, error) {
 }
 
 func (p *PassStore) Set(key, value string) error {
-	cmd := exec.Command(p.passPath, "insert", "-f", passPrefix+key)
+	cmd := exec.Command(p.passPath, "insert", "--force", "--echo", passPrefix+key)
 	cmd.Stdin = strings.NewReader(value)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("pass insert %s: %w: %s", key, err, string(out))
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("pass insert %s: %w", key, err)
 	}
 	return nil
 }
