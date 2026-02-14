@@ -62,7 +62,30 @@ atl jira issue comment --key PROJ-789 --body "入力バリデーションを修�
 atl jira issue update --key PROJ-789 --status "Done"
 ```
 
-## 5. プロジェクトの状況を把握する
+## 5. Jira 課題を todo にインポートする
+
+Jira の課題を `/todo` にインポートして、ローカルでタスク管理する。
+
+```bash
+# プロジェクトの課題をインポート
+atl jira issue list --project PROJ --json \
+  | bash skills/todo/references/import-helper.sh \
+  | todo datasource import jira --stdin
+
+# スプリントの課題をインポート
+atl jira sprint issues --sprint 100 --json \
+  | bash skills/todo/references/import-helper.sh \
+  | todo datasource import jira --stdin
+
+# 自分の課題だけをインポート
+atl jira issue list --project PROJ --assignee me --json \
+  | bash skills/todo/references/import-helper.sh \
+  | todo datasource import jira --stdin
+```
+
+詳細は `skills/todo/references/import.md` を参照。
+
+## 6. プロジェクトの状況を把握する
 
 プロジェクト全体の状況を JQL で確認する。
 
