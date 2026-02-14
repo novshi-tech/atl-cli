@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"novshi-tech.com/jira-cli/internal/adf"
@@ -105,6 +106,54 @@ func (c *Client) TransitionIssue(key, targetStatus string) error {
 func (c *Client) AddComment(key, body string) error {
 	req := AddCommentRequest{Body: adf.TextToADF(body)}
 	return c.doRequest("POST", "/rest/api/3/issue/"+key+"/comment", req, nil)
+}
+
+// SearchIssues searches for issues using JQL.
+func (c *Client) SearchIssues(jql string, maxResults int) (*SearchResponse, error) {
+	path := fmt.Sprintf("/rest/api/3/search?jql=%s&maxResults=%d&fields=summary,status,issuetype,assignee",
+		urlEncode(jql), maxResults)
+	var resp SearchResponse
+	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// GetIssue retrieves a single issue with full details.
+func (c *Client) GetIssue(key string) (*Issue, error) {
+	path := fmt.Sprintf("/rest/api/3/issue/%s?fields=summary,status,issuetype,assignee,description,comment", key)
+	var resp Issue
+	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// ListSprints lists sprints for a board.
+func (c *Client) ListSprints(boardID int, state string) (*SprintsResponse, error) {
+	path := fmt.Sprintf("/rest/agile/1.0/board/%d/sprint", boardID)
+	if state != "" {
+		path += "?state=" + urlEncode(state)
+	}
+	var resp SprintsResponse
+	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+// GetSprintIssues retrieves issues in a sprint.
+func (c *Client) GetSprintIssues(sprintID int) (*SprintIssuesResponse, error) {
+	path := fmt.Sprintf("/rest/agile/1.0/sprint/%d/issue?fields=summary,status,issuetype,assignee", sprintID)
+	var resp SprintIssuesResponse
+	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
+func urlEncode(s string) string {
+	return url.QueryEscape(s)
 }
 
 func (c *Client) doRequest(method, path string, body interface{}, result interface{}) error {

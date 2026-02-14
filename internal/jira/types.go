@@ -68,6 +68,67 @@ type TransitionID struct {
 	ID string `json:"id"`
 }
 
+// SearchResponse is the response from the JQL search endpoint.
+type SearchResponse struct {
+	Total  int     `json:"total"`
+	Issues []Issue `json:"issues"`
+}
+
+// Issue represents a Jira issue.
+type Issue struct {
+	Key    string      `json:"key"`
+	Fields IssueFields `json:"fields"`
+}
+
+type IssueFields struct {
+	Summary     string         `json:"summary"`
+	Status      Status         `json:"status"`
+	IssueType   IssueTypeInfo  `json:"issuetype"`
+	Assignee    *User          `json:"assignee"`
+	Description *adf.Node      `json:"description"`
+	Comment     *CommentResult `json:"comment"`
+}
+
+type Status struct {
+	Name string `json:"name"`
+}
+
+type IssueTypeInfo struct {
+	Name string `json:"name"`
+}
+
+type User struct {
+	DisplayName string `json:"displayName"`
+}
+
+type CommentResult struct {
+	Comments []Comment `json:"comments"`
+}
+
+type Comment struct {
+	Author  User     `json:"author"`
+	Body    adf.Node `json:"body"`
+	Created string   `json:"created"`
+}
+
+// SprintsResponse is the response from the sprint list endpoint.
+type SprintsResponse struct {
+	Values []Sprint `json:"values"`
+}
+
+type Sprint struct {
+	ID    int    `json:"id"`
+	Name  string `json:"name"`
+	State string `json:"state"`
+	Goal  string `json:"goal,omitempty"`
+}
+
+// SprintIssuesResponse is the response from the sprint issues endpoint.
+type SprintIssuesResponse struct {
+	Total  int     `json:"total"`
+	Issues []Issue `json:"issues"`
+}
+
 // APIError represents an error response from the Jira API.
 type APIError struct {
 	ErrorMessages []string          `json:"errorMessages"`
