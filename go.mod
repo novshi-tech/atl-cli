@@ -1,4 +1,4 @@
-module novshi-tech.com/jira-cli
+module novshi-tech.com/atl
 
 go 1.25.7
 

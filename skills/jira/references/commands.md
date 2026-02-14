@@ -1,11 +1,11 @@
-# jira-cli コマンドリファレンス
+# atl コマンドリファレンス
 
-## issue create
+## jira issue create
 
 新しい Jira 課題を作成する。
 
 ```
-jira-cli issue create [flags]
+atl jira issue create [flags]
 ```
 
 | フラグ | 短縮 | 必須 | デフォルト | 説明 |
@@ -22,12 +22,12 @@ Created issue: PROJ-456
 URL: https://example.atlassian.net/browse/PROJ-456
 ```
 
-## issue list
+## jira issue list
 
 JQL で課題を検索する。`--jql` を指定した場合、他のフィルタフラグは無視される。`--jql` を指定しない場合、`--project`、`--status`、`--assignee` から JQL を自動生成する。
 
 ```
-jira-cli issue list [flags]
+atl jira issue list [flags]
 ```
 
 | フラグ | 短縮 | 必須 | デフォルト | 説明 |
@@ -48,12 +48,12 @@ PROJ-124      To Do            Unassigned            新機能の設計
 PROJ-125      Done             Jane Smith            API ドキュメント更新
 ```
 
-## issue view
+## jira issue view
 
 課題の詳細情報（サマリー、ステータス、タイプ、アサイニー、説明、コメント）を表示する。
 
 ```
-jira-cli issue view [flags]
+atl jira issue view [flags]
 ```
 
 | フラグ | 短縮 | 必須 | デフォルト | 説明 |
@@ -79,12 +79,12 @@ URL:       https://example.atlassian.net/browse/PROJ-123
 修正方針を確認しました。
 ```
 
-## issue update
+## jira issue update
 
 既存の課題を更新する。`--summary`、`--description`、`--status` のいずれかを指定する。
 
 ```
-jira-cli issue update [flags]
+atl jira issue update [flags]
 ```
 
 | フラグ | 短縮 | 必須 | デフォルト | 説明 |
@@ -95,12 +95,12 @@ jira-cli issue update [flags]
 | `--status` | - | No | - | 遷移先ステータス |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 
-## issue comment
+## jira issue comment
 
 課題にコメントを追加する。
 
 ```
-jira-cli issue comment [flags]
+atl jira issue comment [flags]
 ```
 
 | フラグ | 短縮 | 必須 | デフォルト | 説明 |
@@ -109,12 +109,12 @@ jira-cli issue comment [flags]
 | `--body` | `-b` | Yes | - | コメント本文 |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 
-## sprint list
+## jira sprint list
 
 ボードのスプリント一覧を表示する。
 
 ```
-jira-cli sprint list [flags]
+atl jira sprint list [flags]
 ```
 
 | フラグ | 短縮 | 必須 | デフォルト | 説明 |
@@ -129,12 +129,12 @@ jira-cli sprint list [flags]
 43      future      Sprint 11
 ```
 
-## sprint issues
+## jira sprint issues
 
 スプリント内の課題一覧を表示する。
 
 ```
-jira-cli sprint issues [flags]
+atl jira sprint issues [flags]
 ```
 
 | フラグ | 短縮 | 必須 | デフォルト | 説明 |
@@ -147,15 +147,15 @@ jira-cli sprint issues [flags]
 サイトの認証情報を設定する。
 
 ```
-jira-cli configure --site <alias>
+atl configure --site <alias>
 ```
 
-対話的に Jira URL、メールアドレス、API トークンを入力する。
+対話的にサイト URL、メールアドレス、API トークンを入力する。
 
 ## sites
 
 設定済みサイトの一覧を表示する。
 
 ```
-jira-cli sites
+atl sites
 ```

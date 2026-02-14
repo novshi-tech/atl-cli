@@ -1,6 +1,6 @@
 package main
 
-import "novshi-tech.com/jira-cli/cmd"
+import "novshi-tech.com/atl/cmd"
 
 func main() {
 	cmd.Execute()

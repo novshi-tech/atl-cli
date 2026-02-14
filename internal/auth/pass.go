@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const passPrefix = "jira-cli/"
+const passPrefix = "atl/"
 
 // PassStore implements CredentialStore using pass(1).
 type PassStore struct {

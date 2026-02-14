@@ -9,12 +9,12 @@ import (
 
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
-	"novshi-tech.com/jira-cli/internal/auth"
+	"novshi-tech.com/atl/internal/auth"
 )
 
 var configureCmd = &cobra.Command{
 	Use:   "configure",
-	Short: "Configure authentication for a Jira site",
+	Short: "Configure authentication for an Atlassian site",
 	RunE:  runConfigure,
 }
 
@@ -38,9 +38,9 @@ func runConfigure(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Configuring site %q\n", alias)
 
-	fmt.Print("Jira URL (e.g., https://yourcompany.atlassian.net): ")
-	jiraURL, _ := reader.ReadString('\n')
-	jiraURL = strings.TrimSpace(jiraURL)
+	fmt.Print("Site URL (e.g., https://yourcompany.atlassian.net): ")
+	siteURL, _ := reader.ReadString('\n')
+	siteURL = strings.TrimSpace(siteURL)
 
 	fmt.Print("Email: ")
 	email, _ := reader.ReadString('\n')
@@ -55,7 +55,7 @@ func runConfigure(cmd *cobra.Command, args []string) error {
 	apiToken := string(tokenBytes)
 
 	creds := auth.SiteCredentials{
-		JiraURL:  jiraURL,
+		BaseURL:  siteURL,
 		Email:    email,
 		APIToken: apiToken,
 	}

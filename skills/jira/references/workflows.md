@@ -6,13 +6,13 @@
 
 ```bash
 # 自分の課題を確認
-jira-cli issue list --project PROJ --assignee me --status "To Do"
+atl jira issue list --project PROJ --assignee me --status "To Do"
 
 # 課題の詳細を確認
-jira-cli issue view --key PROJ-123
+atl jira issue view --key PROJ-123
 
 # ステータスを "In Progress" に変更
-jira-cli issue update --key PROJ-123 --status "In Progress"
+atl jira issue update --key PROJ-123 --status "In Progress"
 ```
 
 ## 2. 課題を作成してブランチで作業する
@@ -21,17 +21,17 @@ jira-cli issue update --key PROJ-123 --status "In Progress"
 
 ```bash
 # 課題を作成
-jira-cli issue create --project PROJ --summary "ユーザー認証の実装" --type Story --description "OAuth2 を使った認証機能を実装する"
+atl jira issue create --project PROJ --summary "ユーザー認証の実装" --type Story --description "OAuth2 を使った認証機能を実装する"
 
 # 出力された課題キーでブランチを作成
 git checkout -b feature/PROJ-456-user-auth
 
 # 作業中にステータスを更新
-jira-cli issue update --key PROJ-456 --status "In Progress"
+atl jira issue update --key PROJ-456 --status "In Progress"
 
 # 作業完了後
-jira-cli issue comment --key PROJ-456 --body "PR #42 を作成しました"
-jira-cli issue update --key PROJ-456 --status "In Review"
+atl jira issue comment --key PROJ-456 --body "PR #42 を作成しました"
+atl jira issue update --key PROJ-456 --status "In Review"
 ```
 
 ## 3. スプリントの進捗を確認する
@@ -40,10 +40,10 @@ jira-cli issue update --key PROJ-456 --status "In Review"
 
 ```bash
 # アクティブなスプリントを確認
-jira-cli sprint list --board 42 --state active
+atl jira sprint list --board 42 --state active
 
 # スプリント内の課題を確認
-jira-cli sprint issues --sprint 100
+atl jira sprint issues --sprint 100
 ```
 
 ## 4. バグ報告と対応
@@ -52,14 +52,14 @@ jira-cli sprint issues --sprint 100
 
 ```bash
 # バグを作成
-jira-cli issue create --project PROJ --summary "ログイン画面で500エラー" --type Bug --description "メールアドレスに+を含む場合にサーバーエラーが発生する"
+atl jira issue create --project PROJ --summary "ログイン画面で500エラー" --type Bug --description "メールアドレスに+を含む場合にサーバーエラーが発生する"
 
 # 自分で対応する場合はステータスを変更
-jira-cli issue update --key PROJ-789 --status "In Progress"
+atl jira issue update --key PROJ-789 --status "In Progress"
 
 # 修正後にコメントとステータス更新
-jira-cli issue comment --key PROJ-789 --body "入力バリデーションを修正。PR #55 参照"
-jira-cli issue update --key PROJ-789 --status "Done"
+atl jira issue comment --key PROJ-789 --body "入力バリデーションを修正。PR #55 参照"
+atl jira issue update --key PROJ-789 --status "Done"
 ```
 
 ## 5. プロジェクトの状況を把握する
@@ -68,11 +68,11 @@ jira-cli issue update --key PROJ-789 --status "Done"
 
 ```bash
 # 未完了の課題を確認
-jira-cli issue list --project PROJ --jql "project = PROJ AND status != Done ORDER BY priority DESC"
+atl jira issue list --project PROJ --jql "project = PROJ AND status != Done ORDER BY priority DESC"
 
 # 特定のスプリントで残っている課題
-jira-cli issue list --jql "sprint in openSprints() AND project = PROJ AND status != Done"
+atl jira issue list --jql "sprint in openSprints() AND project = PROJ AND status != Done"
 
 # 最近更新された課題
-jira-cli issue list --jql "project = PROJ AND updated >= -7d ORDER BY updated DESC"
+atl jira issue list --jql "project = PROJ AND updated >= -7d ORDER BY updated DESC"
 ```

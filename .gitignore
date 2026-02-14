@@ -1,5 +1,5 @@
 # Binaries
-jira-cli
+atl
 *.exe
 *.exe~
 *.dll

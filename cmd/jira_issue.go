@@ -8,6 +8,5 @@ var issueCmd = &cobra.Command{
 }
 
 func init() {
-	issueCmd.PersistentFlags().String("site", "", "Site alias to use (defaults to the default site)")
-	rootCmd.AddCommand(issueCmd)
+	jiraCmd.AddCommand(issueCmd)
 }

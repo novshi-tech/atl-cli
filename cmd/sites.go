@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"novshi-tech.com/jira-cli/internal/auth"
+	"novshi-tech.com/atl/internal/auth"
 )
 
 var sitesCmd = &cobra.Command{
 	Use:   "sites",
-	Short: "List configured Jira sites",
+	Short: "List configured Atlassian sites",
 	RunE:  runSites,
 }
 
@@ -29,7 +29,7 @@ func runSites(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(sites) == 0 {
-		fmt.Println("No sites configured. Run 'jira-cli configure --site <name>' to add one.")
+		fmt.Println("No sites configured. Run 'atl configure --site <name>' to add one.")
 		return nil
 	}
 

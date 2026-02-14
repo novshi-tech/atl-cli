@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
-	"novshi-tech.com/jira-cli/internal/adf"
-	"novshi-tech.com/jira-cli/internal/auth"
+	"novshi-tech.com/atl/internal/adf"
+	"novshi-tech.com/atl/internal/auth"
 )
 
 // Client is an HTTP client for the Jira REST API v3.
@@ -24,7 +24,7 @@ type Client struct {
 // NewClient creates a new Jira client from credentials.
 func NewClient(creds auth.SiteCredentials) *Client {
 	return &Client{
-		baseURL:    strings.TrimRight(creds.JiraURL, "/"),
+		baseURL:    strings.TrimRight(creds.BaseURL, "/"),
 		email:      creds.Email,
 		apiToken:   creds.APIToken,
 		httpClient: &http.Client{},

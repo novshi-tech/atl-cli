@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"novshi-tech.com/jira-cli/internal/auth"
-	"novshi-tech.com/jira-cli/internal/jira"
+	"novshi-tech.com/atl/internal/auth"
+	"novshi-tech.com/atl/internal/jira"
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "jira-cli",
-	Short: "A CLI tool for Jira Cloud",
+	Use:   "atl",
+	Short: "A CLI for Atlassian Cloud products",
 }
 
 func Execute() {
@@ -31,7 +31,7 @@ func newJiraClient(cmd *cobra.Command) (*jira.Client, error) {
 	if site == "" {
 		site, err = auth.GetDefaultSite(store)
 		if err != nil {
-			return nil, fmt.Errorf("no --site specified and no default site configured; run 'jira-cli configure --site <name>' first")
+			return nil, fmt.Errorf("no --site specified and no default site configured; run 'atl configure --site <name>' first")
 		}
 	}
 

@@ -7,27 +7,27 @@ description: Jira Cloud の操作を行うスキル。課題の作成・検索�
 
 ## Overview
 
-`jira-cli` を使って Jira Cloud を操作するスキル。課題の CRUD 操作、JQL 検索、スプリント管理をコマンドラインから実行できる。
+`atl jira` を使って Jira Cloud を操作するスキル。課題の CRUD 操作、JQL 検索、スプリント管理をコマンドラインから実行できる。
 
 ## Quick Start
 
-すべてのコマンドは `jira-cli` を経由して実行する。事前に `jira-cli configure` でサイト設定が必要。
+すべてのコマンドは `atl jira` を経由して実行する。事前に `atl configure` でサイト設定が必要。
 
 ```bash
 # 課題を検索
-jira-cli issue list --project PROJ --status "In Progress"
+atl jira issue list --project PROJ --status "In Progress"
 
 # 課題の詳細を表示
-jira-cli issue view --key PROJ-123
+atl jira issue view --key PROJ-123
 
 # 課題を作成
-jira-cli issue create --project PROJ --summary "バグ修正" --type Bug --description "詳細説明"
+atl jira issue create --project PROJ --summary "バグ修正" --type Bug --description "詳細説明"
 
 # 課題を更新
-jira-cli issue update --key PROJ-123 --status "Done"
+atl jira issue update --key PROJ-123 --status "Done"
 
 # コメントを追加
-jira-cli issue comment --key PROJ-123 --body "対応完了しました"
+atl jira issue comment --key PROJ-123 --body "対応完了しました"
 ```
 
 ## 課題操作
@@ -38,10 +38,10 @@ JQL クエリまたはフィルタフラグで課題を検索する。
 
 ```bash
 # JQL で直接検索
-jira-cli issue list --jql "project = PROJ AND status = 'In Progress' ORDER BY updated DESC"
+atl jira issue list --jql "project = PROJ AND status = 'In Progress' ORDER BY updated DESC"
 
 # フィルタフラグで検索（JQL を自動生成）
-jira-cli issue list --project PROJ --status "To Do" --assignee me --max 20
+atl jira issue list --project PROJ --status "To Do" --assignee me --max 20
 ```
 
 **フラグ:**
@@ -56,7 +56,7 @@ jira-cli issue list --project PROJ --status "To Do" --assignee me --max 20
 課題のサマリー、ステータス、タイプ、アサイニー、説明、コメントを表示する。
 
 ```bash
-jira-cli issue view --key PROJ-123
+atl jira issue view --key PROJ-123
 ```
 
 ### 課題を作成する (`issue create`)
@@ -64,7 +64,7 @@ jira-cli issue view --key PROJ-123
 新しい課題を作成する。
 
 ```bash
-jira-cli issue create --project PROJ --summary "新機能の実装" --type Story --description "機能の詳細説明"
+atl jira issue create --project PROJ --summary "新機能の実装" --type Story --description "機能の詳細説明"
 ```
 
 **フラグ:**
@@ -79,13 +79,13 @@ jira-cli issue create --project PROJ --summary "新機能の実装" --type Story
 
 ```bash
 # サマリーを更新
-jira-cli issue update --key PROJ-123 --summary "更新後のサマリー"
+atl jira issue update --key PROJ-123 --summary "更新後のサマリー"
 
 # ステータスを遷移
-jira-cli issue update --key PROJ-123 --status "In Progress"
+atl jira issue update --key PROJ-123 --status "In Progress"
 
 # 複数のフィールドを同時に更新
-jira-cli issue update --key PROJ-123 --summary "新サマリー" --status "Done"
+atl jira issue update --key PROJ-123 --summary "新サマリー" --status "Done"
 ```
 
 ### コメントを追加する (`issue comment`)
@@ -93,7 +93,7 @@ jira-cli issue update --key PROJ-123 --summary "新サマリー" --status "Done"
 課題にコメントを追加する。
 
 ```bash
-jira-cli issue comment --key PROJ-123 --body "PR をレビューしてください"
+atl jira issue comment --key PROJ-123 --body "PR をレビューしてください"
 ```
 
 ## スプリント操作
@@ -104,10 +104,10 @@ jira-cli issue comment --key PROJ-123 --body "PR をレビューしてくださ�
 
 ```bash
 # すべてのスプリント
-jira-cli sprint list --board 42
+atl jira sprint list --board 42
 
 # アクティブなスプリントのみ
-jira-cli sprint list --board 42 --state active
+atl jira sprint list --board 42 --state active
 ```
 
 **フラグ:**
@@ -119,12 +119,12 @@ jira-cli sprint list --board 42 --state active
 特定のスプリントに含まれる課題を一覧表示する。
 
 ```bash
-jira-cli sprint issues --sprint 100
+atl jira sprint issues --sprint 100
 ```
 
 ## 共通フラグ
 
-すべてのコマンドで以下のフラグが使用可能:
+すべての jira サブコマンドで以下のフラグが使用可能:
 
 - `--site` - 使用するサイトエイリアス（未指定時はデフォルトサイト）
 

@@ -2,7 +2,7 @@ package auth
 
 import "github.com/zalando/go-keyring"
 
-const keyringService = "jira-cli"
+const keyringService = "atl"
 
 // KeyringStore implements CredentialStore using the OS keyring.
 type KeyringStore struct{}

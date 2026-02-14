@@ -24,8 +24,6 @@ var sprintIssuesCmd = &cobra.Command{
 }
 
 func init() {
-	sprintCmd.PersistentFlags().String("site", "", "Site alias to use (defaults to the default site)")
-
 	sprintListCmd.Flags().Int("board", 0, "Board ID (required)")
 	sprintListCmd.MarkFlagRequired("board")
 	sprintListCmd.Flags().String("state", "", "Filter by state (active, closed, future)")
@@ -35,7 +33,7 @@ func init() {
 
 	sprintCmd.AddCommand(sprintListCmd)
 	sprintCmd.AddCommand(sprintIssuesCmd)
-	rootCmd.AddCommand(sprintCmd)
+	jiraCmd.AddCommand(sprintCmd)
 }
 
 func runSprintList(cmd *cobra.Command, args []string) error {

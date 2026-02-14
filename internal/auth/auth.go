@@ -12,9 +12,9 @@ type CredentialStore interface {
 	Delete(key string) error
 }
 
-// SiteCredentials holds authentication information for a Jira site.
+// SiteCredentials holds authentication information for an Atlassian site.
 type SiteCredentials struct {
-	JiraURL  string
+	BaseURL  string
 	Email    string
 	APIToken string
 }
@@ -34,8 +34,8 @@ func NewStore() (CredentialStore, error) {
 
 // SaveSite stores credentials for the given site alias.
 func SaveSite(store CredentialStore, alias string, creds SiteCredentials) error {
-	if err := store.Set(alias+"/jira-url", creds.JiraURL); err != nil {
-		return fmt.Errorf("saving jira-url: %w", err)
+	if err := store.Set(alias+"/base-url", creds.BaseURL); err != nil {
+		return fmt.Errorf("saving base-url: %w", err)
 	}
 	if err := store.Set(alias+"/email", creds.Email); err != nil {
 		return fmt.Errorf("saving email: %w", err)
@@ -48,9 +48,9 @@ func SaveSite(store CredentialStore, alias string, creds SiteCredentials) error 
 
 // LoadSite loads credentials for the given site alias.
 func LoadSite(store CredentialStore, alias string) (SiteCredentials, error) {
-	url, err := store.Get(alias + "/jira-url")
+	url, err := store.Get(alias + "/base-url")
 	if err != nil {
-		return SiteCredentials{}, fmt.Errorf("loading jira-url for site %q: %w", alias, err)
+		return SiteCredentials{}, fmt.Errorf("loading base-url for site %q: %w", alias, err)
 	}
 	email, err := store.Get(alias + "/email")
 	if err != nil {
@@ -60,7 +60,7 @@ func LoadSite(store CredentialStore, alias string) (SiteCredentials, error) {
 	if err != nil {
 		return SiteCredentials{}, fmt.Errorf("loading api-token for site %q: %w", alias, err)
 	}
-	return SiteCredentials{JiraURL: url, Email: email, APIToken: token}, nil
+	return SiteCredentials{BaseURL: url, Email: email, APIToken: token}, nil
 }
 
 // GetDefaultSite returns the default site alias.
