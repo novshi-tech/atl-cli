@@ -4,7 +4,7 @@
 
 ## ヘルパースクリプト
 
-`skills/todo/references/import-helper.sh` は `atl jira` の JSON 出力を `/todo` の JSONL 形式に変換する。
+`skills/import-jira-to-todo/scripts/import-helper.sh` は `atl jira` の JSON 出力を `/todo` の JSONL 形式に変換する。
 
 ### 対応入力
 
@@ -50,7 +50,7 @@
 
 ```bash
 atl jira issue list --project PROJ --json \
-  | bash skills/todo/references/import-helper.sh \
+  | bash skills/import-jira-to-todo/scripts/import-helper.sh \
   | todo datasource import jira --stdin
 ```
 
@@ -58,7 +58,7 @@ atl jira issue list --project PROJ --json \
 
 ```bash
 atl jira sprint issues --sprint 100 --json \
-  | bash skills/todo/references/import-helper.sh \
+  | bash skills/import-jira-to-todo/scripts/import-helper.sh \
   | todo datasource import jira --stdin
 ```
 
@@ -66,6 +66,6 @@ atl jira sprint issues --sprint 100 --json \
 
 ```bash
 atl jira issue view --key PROJ-123 --json \
-  | bash skills/todo/references/import-helper.sh \
+  | bash skills/import-jira-to-todo/scripts/import-helper.sh \
   | todo datasource import jira --stdin
 ```
