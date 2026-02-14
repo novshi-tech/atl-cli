@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -14,10 +15,25 @@ var rootCmd = &cobra.Command{
 	Short: "A CLI for Atlassian Cloud products",
 }
 
+func init() {
+	rootCmd.PersistentFlags().Bool("json", false, "Output in JSON format")
+}
+
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func jsonMode(cmd *cobra.Command) bool {
+	v, _ := cmd.Flags().GetBool("json")
+	return v
+}
+
+func printJSON(v any) error {
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "  ")
+	return enc.Encode(v)
 }
 
 // newJiraClient resolves the site alias from the --site flag (or default) and returns a Jira client.

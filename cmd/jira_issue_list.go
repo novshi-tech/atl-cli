@@ -60,6 +60,24 @@ func runIssueList(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	if jsonMode(cmd) {
+		items := make([]JSONIssueItem, len(resp.Issues))
+		for i, issue := range resp.Issues {
+			assignee := ""
+			if issue.Fields.Assignee != nil {
+				assignee = issue.Fields.Assignee.DisplayName
+			}
+			items[i] = JSONIssueItem{
+				Key:      issue.Key,
+				Summary:  issue.Fields.Summary,
+				Status:   issue.Fields.Status.Name,
+				Type:     issue.Fields.IssueType.Name,
+				Assignee: assignee,
+			}
+		}
+		return printJSON(items)
+	}
+
 	if len(resp.Issues) == 0 {
 		fmt.Println("No issues found.")
 		return nil

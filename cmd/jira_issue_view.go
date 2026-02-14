@@ -38,6 +38,30 @@ func runIssueView(cmd *cobra.Command, args []string) error {
 		assignee = issue.Fields.Assignee.DisplayName
 	}
 
+	if jsonMode(cmd) {
+		detail := JSONIssueDetail{
+			Key:      issue.Key,
+			Summary:  issue.Fields.Summary,
+			Status:   issue.Fields.Status.Name,
+			Type:     issue.Fields.IssueType.Name,
+			Assignee: assignee,
+			URL:      fmt.Sprintf("%s/browse/%s", client.BaseURL(), issue.Key),
+		}
+		if issue.Fields.Description != nil {
+			detail.Description = adfToText(issue.Fields.Description)
+		}
+		if issue.Fields.Comment != nil {
+			for _, c := range issue.Fields.Comment.Comments {
+				detail.Comments = append(detail.Comments, JSONCommentItem{
+					Author:  c.Author.DisplayName,
+					Created: c.Created,
+					Body:    adfToText(&c.Body),
+				})
+			}
+		}
+		return printJSON(detail)
+	}
+
 	fmt.Printf("Key:       %s\n", issue.Key)
 	fmt.Printf("Summary:   %s\n", issue.Fields.Summary)
 	fmt.Printf("Status:    %s\n", issue.Fields.Status.Name)

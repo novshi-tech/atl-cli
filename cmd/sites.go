@@ -28,12 +28,23 @@ func runSites(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	defaultSite, _ := auth.GetDefaultSite(store)
+
+	if jsonMode(cmd) {
+		items := make([]JSONSiteItem, len(sites))
+		for i, s := range sites {
+			items[i] = JSONSiteItem{
+				Name:    s,
+				Default: s == defaultSite,
+			}
+		}
+		return printJSON(items)
+	}
+
 	if len(sites) == 0 {
 		fmt.Println("No sites configured. Run 'atl configure --site <name>' to add one.")
 		return nil
 	}
-
-	defaultSite, _ := auth.GetDefaultSite(store)
 
 	for _, s := range sites {
 		if s == defaultSite {

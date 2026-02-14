@@ -38,6 +38,13 @@ func runIssueCreate(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	if jsonMode(cmd) {
+		return printJSON(JSONMutationResult{
+			Key: resp.Key,
+			URL: fmt.Sprintf("%s/browse/%s", client.BaseURL(), resp.Key),
+		})
+	}
+
 	fmt.Printf("Created issue: %s\n", resp.Key)
 	fmt.Printf("URL: %s/browse/%s\n", client.BaseURL(), resp.Key)
 	return nil

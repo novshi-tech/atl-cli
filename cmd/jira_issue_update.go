@@ -32,22 +32,38 @@ func runIssueUpdate(cmd *cobra.Command, args []string) error {
 	description, _ := cmd.Flags().GetString("description")
 	status, _ := cmd.Flags().GetString("status")
 
+	if summary == "" && description == "" && status == "" {
+		if jsonMode(cmd) {
+			return printJSON(JSONMutationResult{Key: key, URL: fmt.Sprintf("%s/browse/%s", client.BaseURL(), key)})
+		}
+		fmt.Println("Nothing to update. Specify --summary, --description, or --status.")
+		fmt.Printf("URL: %s/browse/%s\n", client.BaseURL(), key)
+		return nil
+	}
+
 	if summary != "" || description != "" {
 		if err := client.UpdateIssue(key, summary, description); err != nil {
 			return err
 		}
-		fmt.Printf("Updated issue: %s\n", key)
+		if !jsonMode(cmd) {
+			fmt.Printf("Updated issue: %s\n", key)
+		}
 	}
 
 	if status != "" {
 		if err := client.TransitionIssue(key, status); err != nil {
 			return err
 		}
-		fmt.Printf("Transitioned %s to %q\n", key, status)
+		if !jsonMode(cmd) {
+			fmt.Printf("Transitioned %s to %q\n", key, status)
+		}
 	}
 
-	if summary == "" && description == "" && status == "" {
-		fmt.Println("Nothing to update. Specify --summary, --description, or --status.")
+	if jsonMode(cmd) {
+		return printJSON(JSONMutationResult{
+			Key: key,
+			URL: fmt.Sprintf("%s/browse/%s", client.BaseURL(), key),
+		})
 	}
 
 	fmt.Printf("URL: %s/browse/%s\n", client.BaseURL(), key)

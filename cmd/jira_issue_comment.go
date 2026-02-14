@@ -33,6 +33,13 @@ func runIssueComment(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	if jsonMode(cmd) {
+		return printJSON(JSONMutationResult{
+			Key: key,
+			URL: fmt.Sprintf("%s/browse/%s", client.BaseURL(), key),
+		})
+	}
+
 	fmt.Printf("Comment added to %s\n", key)
 	fmt.Printf("URL: %s/browse/%s\n", client.BaseURL(), key)
 	return nil

@@ -50,6 +50,19 @@ func runSprintList(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	if jsonMode(cmd) {
+		items := make([]JSONSprintItem, len(resp.Values))
+		for i, s := range resp.Values {
+			items[i] = JSONSprintItem{
+				ID:    s.ID,
+				Name:  s.Name,
+				State: s.State,
+				Goal:  s.Goal,
+			}
+		}
+		return printJSON(items)
+	}
+
 	if len(resp.Values) == 0 {
 		fmt.Println("No sprints found.")
 		return nil
@@ -76,6 +89,24 @@ func runSprintIssues(cmd *cobra.Command, args []string) error {
 	resp, err := client.GetSprintIssues(sprintID)
 	if err != nil {
 		return err
+	}
+
+	if jsonMode(cmd) {
+		items := make([]JSONIssueItem, len(resp.Issues))
+		for i, issue := range resp.Issues {
+			assignee := ""
+			if issue.Fields.Assignee != nil {
+				assignee = issue.Fields.Assignee.DisplayName
+			}
+			items[i] = JSONIssueItem{
+				Key:      issue.Key,
+				Summary:  issue.Fields.Summary,
+				Status:   issue.Fields.Status.Name,
+				Type:     issue.Fields.IssueType.Name,
+				Assignee: assignee,
+			}
+		}
+		return printJSON(items)
 	}
 
 	if len(resp.Issues) == 0 {
