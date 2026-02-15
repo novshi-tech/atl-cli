@@ -7,7 +7,7 @@
 #   - atl jira issue view --json   (単一オブジェクト)
 #
 # 使用例:
-#   atl jira issue list --project PROJ --json | bash import-helper.sh
+#   atl jira issue list --jql "project = PROJ ORDER BY updated DESC" --json | bash import-helper.sh
 #   atl jira issue view --key PROJ-123 --json | bash import-helper.sh
 
 jq -c '

@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -14,10 +13,7 @@ var issueListCmd = &cobra.Command{
 }
 
 func init() {
-	issueListCmd.Flags().String("jql", "", "JQL query string")
-	issueListCmd.Flags().StringP("project", "p", "", "Filter by project key")
-	issueListCmd.Flags().String("status", "", "Filter by status")
-	issueListCmd.Flags().String("assignee", "", "Filter by assignee (use 'me' for current user)")
+	issueListCmd.Flags().String("jql", "", "JQL query string (required)")
 	issueListCmd.Flags().Int("max", 50, "Maximum number of results")
 	issueCmd.AddCommand(issueListCmd)
 }
@@ -29,30 +25,10 @@ func runIssueList(cmd *cobra.Command, args []string) error {
 	}
 
 	jql, _ := cmd.Flags().GetString("jql")
-	project, _ := cmd.Flags().GetString("project")
-	status, _ := cmd.Flags().GetString("status")
-	assignee, _ := cmd.Flags().GetString("assignee")
 	max, _ := cmd.Flags().GetInt("max")
 
 	if jql == "" {
-		var clauses []string
-		if project != "" {
-			clauses = append(clauses, fmt.Sprintf("project = %s", project))
-		}
-		if status != "" {
-			clauses = append(clauses, fmt.Sprintf("status = \"%s\"", status))
-		}
-		if assignee != "" {
-			if assignee == "me" {
-				clauses = append(clauses, "assignee = currentUser()")
-			} else {
-				clauses = append(clauses, fmt.Sprintf("assignee = \"%s\"", assignee))
-			}
-		}
-		if len(clauses) == 0 {
-			return fmt.Errorf("specify --jql or at least one of --project, --status, --assignee")
-		}
-		jql = strings.Join(clauses, " AND ") + " ORDER BY updated DESC"
+		return fmt.Errorf("--jql is required")
 	}
 
 	resp, err := client.SearchIssues(jql, max)

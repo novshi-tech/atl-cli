@@ -6,7 +6,7 @@
 
 ```bash
 # 自分の課題を確認
-atl jira issue list --project PROJ --assignee me --status "To Do"
+atl jira issue list --jql "project = PROJ AND assignee = currentUser() AND status = 'To Do' ORDER BY updated DESC"
 
 # 課題の詳細を確認
 atl jira issue view --key PROJ-123
@@ -68,7 +68,7 @@ Jira の課題を `/todo` にインポートして、ローカルでタスク管
 
 ```bash
 # プロジェクトの課題をインポート
-atl jira issue list --project PROJ --json \
+atl jira issue list --jql "project = PROJ ORDER BY updated DESC" --json \
   | bash skills/import-jira-to-todo/scripts/import-helper.sh \
   | todo datasource import jira --stdin
 
@@ -77,8 +77,8 @@ atl jira sprint issues --sprint 100 --json \
   | bash skills/import-jira-to-todo/scripts/import-helper.sh \
   | todo datasource import jira --stdin
 
-# 自分の課題だけをインポート
-atl jira issue list --project PROJ --assignee me --json \
+# 自分の未完了課題だけをインポート
+atl jira issue list --jql "assignee = currentUser() AND statusCategory not in (Done)" --json \
   | bash skills/import-jira-to-todo/scripts/import-helper.sh \
   | todo datasource import jira --stdin
 ```
@@ -91,10 +91,10 @@ atl jira issue list --project PROJ --assignee me --json \
 
 ```bash
 # 未完了の課題を確認
-atl jira issue list --project PROJ --jql "project = PROJ AND status != Done ORDER BY priority DESC"
+atl jira issue list --jql "project = PROJ AND statusCategory not in (Done) ORDER BY priority DESC"
 
 # 特定のスプリントで残っている課題
-atl jira issue list --jql "sprint in openSprints() AND project = PROJ AND status != Done"
+atl jira issue list --jql "sprint in openSprints() AND project = PROJ AND statusCategory not in (Done)"
 
 # 最近更新された課題
 atl jira issue list --jql "project = PROJ AND updated >= -7d ORDER BY updated DESC"

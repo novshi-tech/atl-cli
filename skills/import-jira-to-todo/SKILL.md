@@ -23,8 +23,6 @@ atl jira issue list --site <SITE> \
 
 - `statusCategory not in (Done)` を使うこと。`status not in (Done)` ではカスタム完了ステータス（採用・不採用など）が除外されない
 - Claude Code の Bash ツールは `!` を `\!` にエスケープするため、`!=` 演算子は使えない。代わりに `not in ()` を使う（通常のターミナルでは `!=` も動作する）
-- `--assignee` フラグは `--jql` と併用すると無視されるため、JQL 内で `assignee = currentUser()` を指定する
-
 ## Examples
 
 ```bash

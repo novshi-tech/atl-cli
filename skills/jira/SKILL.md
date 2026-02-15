@@ -15,7 +15,7 @@ description: Jira Cloud の操作を行うスキル。課題の作成・検索�
 
 ```bash
 # 課題を検索
-atl jira issue list --project PROJ --status "In Progress"
+atl jira issue list --jql "project = PROJ AND status = 'In Progress' ORDER BY updated DESC"
 
 # 課題の詳細を表示
 atl jira issue view --key PROJ-123
@@ -34,21 +34,15 @@ atl jira issue comment --key PROJ-123 --body "対応完了しました"
 
 ### 課題を検索する (`issue list`)
 
-JQL クエリまたはフィルタフラグで課題を検索する。
+JQL クエリで課題を検索する。
 
 ```bash
-# JQL で直接検索
 atl jira issue list --jql "project = PROJ AND status = 'In Progress' ORDER BY updated DESC"
-
-# フィルタフラグで検索（JQL を自動生成）
-atl jira issue list --project PROJ --status "To Do" --assignee me --max 20
+atl jira issue list --jql "assignee = currentUser() AND statusCategory not in (Done)" --max 20
 ```
 
 **フラグ:**
-- `--jql` - JQL クエリ文字列（指定時は他のフィルタフラグは無視される）
-- `--project` / `-p` - プロジェクトキーでフィルタ
-- `--status` - ステータスでフィルタ
-- `--assignee` - アサイニーでフィルタ（`me` で現在のユーザー）
+- `--jql` - JQL クエリ文字列（必須）
 - `--max` - 最大件数（デフォルト: 50）
 
 ### 課題の詳細を表示する (`issue view`)
@@ -135,7 +129,7 @@ atl jira sprint issues --sprint 100
 
 ```bash
 # 課題一覧を JSON で取得
-atl jira issue list --project PROJ --json
+atl jira issue list --jql "project = PROJ ORDER BY updated DESC" --json
 
 # 課題の詳細を JSON で取得
 atl jira issue view --key PROJ-123 --json

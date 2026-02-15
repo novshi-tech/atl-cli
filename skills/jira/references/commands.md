@@ -33,7 +33,7 @@ URL: https://example.atlassian.net/browse/PROJ-456
 
 ## jira issue list
 
-JQL で課題を検索する。`--jql` を指定した場合、他のフィルタフラグは無視される。`--jql` を指定しない場合、`--project`、`--status`、`--assignee` から JQL を自動生成する。
+JQL で課題を検索する。
 
 ```
 atl jira issue list [flags]
@@ -41,10 +41,7 @@ atl jira issue list [flags]
 
 | フラグ | 短縮 | 必須 | デフォルト | 説明 |
 |--------|------|------|-----------|------|
-| `--jql` | - | No | - | JQL クエリ文字列 |
-| `--project` | `-p` | No | - | プロジェクトキーでフィルタ |
-| `--status` | - | No | - | ステータスでフィルタ |
-| `--assignee` | - | No | - | アサイニーでフィルタ（`me` で自分） |
+| `--jql` | - | Yes | - | JQL クエリ文字列 |
 | `--max` | - | No | `50` | 最大取得件数 |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
