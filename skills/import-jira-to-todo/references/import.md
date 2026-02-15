@@ -44,28 +44,30 @@
 | `Done` | `done` |
 | その他 | `pending` |
 
+## JQL に関する注意事項
+
+- 未完了タスクのフィルタには `statusCategory not in (Done)` を使う。`status not in (Done)` ではカスタム完了ステータス（採用・不採用など）が除外されない
+- Claude Code の Bash ツールは `!` を `\!` にエスケープするため、`!=` 演算子は使えない。代わりに `not in ()` を使う（通常のターミナルでは `!=` も動作する）
+- `--assignee` フラグは `--jql` と併用すると無視されるため、JQL 内で `assignee = currentUser()` を指定する
+
 ## 使用例
 
-### プロジェクトの課題をインポート
+### 現在のユーザの未完了課題をインポート（デフォルト）
 
 ```bash
-atl jira issue list --project PROJ --json \
+atl jira issue list --site mysite \
+  --jql 'statusCategory not in (Done) AND assignee = currentUser()' \
+  --json \
   | bash skills/import-jira-to-todo/scripts/import-helper.sh \
-  | todo datasource import jira --stdin
+  | todo datasource import my-datasource --stdin
 ```
 
-### スプリントの課題をインポート
+### プロジェクトを追加で絞り込む場合
 
 ```bash
-atl jira sprint issues --sprint 100 --json \
+atl jira issue list --site mysite \
+  --jql 'statusCategory not in (Done) AND assignee = currentUser() AND project = PROJ' \
+  --json \
   | bash skills/import-jira-to-todo/scripts/import-helper.sh \
-  | todo datasource import jira --stdin
-```
-
-### 単一課題をインポート（url, description 付き）
-
-```bash
-atl jira issue view --key PROJ-123 --json \
-  | bash skills/import-jira-to-todo/scripts/import-helper.sh \
-  | todo datasource import jira --stdin
+  | todo datasource import my-datasource --stdin
 ```

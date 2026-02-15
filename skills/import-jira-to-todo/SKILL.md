@@ -7,40 +7,56 @@ description: Jira の課題をローカルの todo システムにインポー�
 
 `atl jira` の JSON 出力を `todo datasource import jira --stdin` にインポートするパイプライン。
 
-## Usage
+## Default Behavior
+
+常に現在のユーザ (`assignee = currentUser()`) の未完了タスク (`statusCategory not in (Done)`) をインポートする。
 
 ```bash
-atl jira <command> --json \
+atl jira issue list --site <SITE> \
+  --jql 'statusCategory not in (Done) AND assignee = currentUser()' \
+  --json \
   | bash skills/import-jira-to-todo/scripts/import-helper.sh \
-  | todo datasource import jira --stdin
+  | todo datasource import <DATASOURCE> --stdin
 ```
 
-### Examples
+## JQL Notes
+
+- `statusCategory not in (Done)` を使うこと。`status not in (Done)` ではカスタム完了ステータス（採用・不採用など）が除外されない
+- Claude Code の Bash ツールは `!` を `\!` にエスケープするため、`!=` 演算子は使えない。代わりに `not in ()` を使う（通常のターミナルでは `!=` も動作する）
+- `--assignee` フラグは `--jql` と併用すると無視されるため、JQL 内で `assignee = currentUser()` を指定する
+
+## Examples
 
 ```bash
-# プロジェクトの課題をインポート
-atl jira issue list --project PROJ --json \
+# サイト指定でインポート
+atl jira issue list --site mysite \
+  --jql 'statusCategory not in (Done) AND assignee = currentUser()' \
+  --json \
   | bash skills/import-jira-to-todo/scripts/import-helper.sh \
-  | todo datasource import jira --stdin
+  | todo datasource import my-datasource --stdin
 
-# スプリントの課題をインポート
-atl jira sprint issues --sprint 100 --json \
+# プロジェクトを追加で絞り込む場合
+atl jira issue list --site mysite \
+  --jql 'statusCategory not in (Done) AND assignee = currentUser() AND project = PROJ' \
+  --json \
   | bash skills/import-jira-to-todo/scripts/import-helper.sh \
-  | todo datasource import jira --stdin
-
-# 単一課題をインポート（url, description 付き）
-atl jira issue view --key PROJ-123 --json \
-  | bash skills/import-jira-to-todo/scripts/import-helper.sh \
-  | todo datasource import jira --stdin
+  | todo datasource import my-datasource --stdin
 ```
 
 ## Status Mapping
 
-| Jira | todo |
+| Jira statusCategory | todo |
 |------|------|
 | To Do | pending |
 | In Progress | in_progress |
-| In Review | in_progress |
+| Done | done |
+
+Individual status mapping in `import-helper.sh`:
+
+| Jira status | todo |
+|------|------|
+| To Do | pending |
+| In Progress / In Review | in_progress |
 | Done | done |
 | その他 | pending |
 
