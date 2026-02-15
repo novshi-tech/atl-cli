@@ -15,11 +15,6 @@ description: Jira の課題をローカルの todo システムにインポー�
 bash skills/import-jira-to-todo/scripts/import-helper.sh <SITE> <DATASOURCE>
 ```
 
-## JQL Notes
-
-- `statusCategory not in (Done)` を使うこと。`status not in (Done)` ではカスタム完了ステータス（採用・不採用など）が除外されない
-- Claude Code の Bash ツールは `!` を `\!` にエスケープするため、`!=` 演算子は使えない。代わりに `not in ()` を使う（通常のターミナルでは `!=` も動作する）
-
 ## Examples
 
 ```bash
