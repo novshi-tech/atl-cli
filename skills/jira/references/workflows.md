@@ -67,20 +67,8 @@ atl jira issue update --key PROJ-789 --status "Done"
 Jira の課題を `/todo` にインポートして、ローカルでタスク管理する。
 
 ```bash
-# プロジェクトの課題をインポート
-atl jira issue list --jql "project = PROJ ORDER BY updated DESC" --json \
-  | bash skills/import-jira-to-todo/scripts/import-helper.sh \
-  | todo datasource import jira --stdin
-
-# スプリントの課題をインポート
-atl jira sprint issues --sprint 100 --json \
-  | bash skills/import-jira-to-todo/scripts/import-helper.sh \
-  | todo datasource import jira --stdin
-
-# 自分の未完了課題だけをインポート
-atl jira issue list --jql "assignee = currentUser() AND statusCategory not in (Done)" --json \
-  | bash skills/import-jira-to-todo/scripts/import-helper.sh \
-  | todo datasource import jira --stdin
+# 自分の未完了課題をインポート
+bash skills/import-jira-to-todo/scripts/import-helper.sh mysite my-datasource
 ```
 
 詳細は `skills/import-jira-to-todo/references/import.md` を参照。
