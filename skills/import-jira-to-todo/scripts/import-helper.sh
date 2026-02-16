@@ -30,8 +30,7 @@ atl jira issue list --site "${SITE}" \
     {
       remote_id: .key,
       title: .summary,
-      status: (.status | map_status),
-      tags: [.type]
+      status: (.status | map_status)
     } + (if .url then {url: .url} else {} end)
       + (if .description then {description: .description} else {} end)
   ' \
