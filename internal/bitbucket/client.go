@@ -20,11 +20,11 @@ type Client struct {
 }
 
 // NewClient creates a new Bitbucket client from credentials.
-// If BBAppPassword is set, it is used instead of APIToken for authentication.
+// If BBAPIToken is set, it is used instead of APIToken for authentication.
 func NewClient(creds auth.SiteCredentials) *Client {
 	token := creds.APIToken
-	if creds.BBAppPassword != "" {
-		token = creds.BBAppPassword
+	if creds.BBAPIToken != "" {
+		token = creds.BBAPIToken
 	}
 	return &Client{
 		email:      creds.Email,

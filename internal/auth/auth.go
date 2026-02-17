@@ -17,7 +17,7 @@ type SiteCredentials struct {
 	BaseURL       string
 	Email         string
 	APIToken      string
-	BBAppPassword string // Bitbucket App Password (optional, used instead of APIToken for Bitbucket)
+	BBAPIToken string // Bitbucket API Token (optional, used instead of APIToken for Bitbucket)
 }
 
 // NewStore returns a CredentialStore, trying keyring first, then falling back to pass.
@@ -44,9 +44,9 @@ func SaveSite(store CredentialStore, alias string, creds SiteCredentials) error 
 	if err := store.Set(alias+"/api-token", creds.APIToken); err != nil {
 		return fmt.Errorf("saving api-token: %w", err)
 	}
-	if creds.BBAppPassword != "" {
-		if err := store.Set(alias+"/bb-app-password", creds.BBAppPassword); err != nil {
-			return fmt.Errorf("saving bb-app-password: %w", err)
+	if creds.BBAPIToken != "" {
+		if err := store.Set(alias+"/bb-api-token", creds.BBAPIToken); err != nil {
+			return fmt.Errorf("saving bb-api-token: %w", err)
 		}
 	}
 	return nil
@@ -66,8 +66,8 @@ func LoadSite(store CredentialStore, alias string) (SiteCredentials, error) {
 	if err != nil {
 		return SiteCredentials{}, fmt.Errorf("loading api-token for site %q: %w", alias, err)
 	}
-	bbAppPassword, _ := store.Get(alias + "/bb-app-password") // optional, ignore error
-	return SiteCredentials{BaseURL: url, Email: email, APIToken: token, BBAppPassword: bbAppPassword}, nil
+	bbAPIToken, _ := store.Get(alias + "/bb-api-token") // optional, ignore error
+	return SiteCredentials{BaseURL: url, Email: email, APIToken: token, BBAPIToken: bbAPIToken}, nil
 }
 
 // GetDefaultSite returns the default site alias.

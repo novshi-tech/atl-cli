@@ -44,13 +44,13 @@ func runConfigure(cmd *cobra.Command, args []string) error {
 	siteURL := promptText(reader, "Site URL", existing.BaseURL)
 	email := promptText(reader, "Email", existing.Email)
 	apiToken := promptSecret("API Token", existing.APIToken)
-	bbAppPassword := promptSecret("Bitbucket App Password", existing.BBAppPassword)
+	bbAPIToken := promptSecret("Bitbucket API Token", existing.BBAPIToken)
 
 	creds := auth.SiteCredentials{
-		BaseURL:       siteURL,
-		Email:         email,
-		APIToken:      apiToken,
-		BBAppPassword: bbAppPassword,
+		BaseURL:    siteURL,
+		Email:      email,
+		APIToken:   apiToken,
+		BBAPIToken: bbAPIToken,
 	}
 
 	if err := auth.SaveSite(store, alias, creds); err != nil {
