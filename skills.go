@@ -1,4 +1,4 @@
-package main
+package atlcli
 
 import "embed"
 

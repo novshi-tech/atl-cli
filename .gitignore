@@ -1,5 +1,5 @@
 # Binaries
-atl
+/atl
 *.exe
 *.exe~
 *.dll
