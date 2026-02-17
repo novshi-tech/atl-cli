@@ -41,3 +41,21 @@ type JSONMutationResult struct {
 	Key string `json:"key"`
 	URL string `json:"url"`
 }
+
+type JSONRepoItem struct {
+	Slug      string `json:"slug"`
+	Name      string `json:"name"`
+	Language  string `json:"language"`
+	IsPrivate bool   `json:"is_private"`
+}
+
+type JSONRepoDetail struct {
+	Slug        string `json:"slug"`
+	Name        string `json:"name"`
+	FullName    string `json:"full_name"`
+	Description string `json:"description"`
+	Language    string `json:"language"`
+	IsPrivate   bool   `json:"is_private"`
+	MainBranch  string `json:"mainbranch"`
+	UpdatedOn   string `json:"updated_on"`
+}
