@@ -7,9 +7,9 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/novshi-tech/atl-cli/internal/auth"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
-	"github.com/novshi-tech/atl-cli/internal/auth"
 )
 
 var configureCmd = &cobra.Command{
@@ -36,28 +36,21 @@ func runConfigure(cmd *cobra.Command, args []string) error {
 
 	reader := bufio.NewReader(os.Stdin)
 
+	// Load existing credentials so Enter preserves current values
+	existing, _ := auth.LoadSite(store, alias)
+
 	fmt.Printf("Configuring site %q\n", alias)
 
-	fmt.Print("Site URL (e.g., https://yourcompany.atlassian.net): ")
-	siteURL, _ := reader.ReadString('\n')
-	siteURL = strings.TrimSpace(siteURL)
-
-	fmt.Print("Email: ")
-	email, _ := reader.ReadString('\n')
-	email = strings.TrimSpace(email)
-
-	fmt.Print("API Token: ")
-	tokenBytes, err := term.ReadPassword(int(syscall.Stdin))
-	if err != nil {
-		return fmt.Errorf("reading API token: %w", err)
-	}
-	fmt.Println()
-	apiToken := string(tokenBytes)
+	siteURL := promptText(reader, "Site URL", existing.BaseURL)
+	email := promptText(reader, "Email", existing.Email)
+	apiToken := promptSecret("API Token", existing.APIToken)
+	bbAppPassword := promptSecret("Bitbucket App Password", existing.BBAppPassword)
 
 	creds := auth.SiteCredentials{
-		BaseURL:  siteURL,
-		Email:    email,
-		APIToken: apiToken,
+		BaseURL:       siteURL,
+		Email:         email,
+		APIToken:      apiToken,
+		BBAppPassword: bbAppPassword,
 	}
 
 	if err := auth.SaveSite(store, alias, creds); err != nil {
@@ -86,4 +79,34 @@ func runConfigure(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Site %q configured successfully.\n", alias)
 	return nil
+}
+
+// promptText prompts for a text value. If the user presses Enter, the existing value is kept.
+func promptText(reader *bufio.Reader, label, current string) string {
+	if current != "" {
+		fmt.Printf("%s [%s]: ", label, current)
+	} else {
+		fmt.Printf("%s: ", label)
+	}
+	input, _ := reader.ReadString('\n')
+	input = strings.TrimSpace(input)
+	if input == "" {
+		return current
+	}
+	return input
+}
+
+// promptSecret prompts for a secret value (input hidden). If the user presses Enter, the existing value is kept.
+func promptSecret(label, current string) string {
+	if current != "" {
+		fmt.Printf("%s [****]: ", label)
+	} else {
+		fmt.Printf("%s (Enter to skip): ", label)
+	}
+	b, err := term.ReadPassword(int(syscall.Stdin))
+	fmt.Println()
+	if err != nil || len(b) == 0 {
+		return current
+	}
+	return string(b)
 }
