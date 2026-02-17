@@ -12,7 +12,7 @@ description: Jira の課題をローカルの todo システムにインポー�
 常に現在のユーザ (`assignee = currentUser()`) の未完了タスク (`statusCategory not in (Done)`) をインポートする。
 
 ```bash
-bash skills/import-jira-to-todo/scripts/import-helper.sh <SITE> <DATASOURCE>
+bash scripts/import-helper.sh <SITE> <DATASOURCE>
 ```
 
 ## Examples
