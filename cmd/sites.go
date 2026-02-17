@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"novshi-tech.com/atl/internal/auth"
+	"github.com/novshi-tech/atl-cli/internal/auth"
 )
 
 var sitesCmd = &cobra.Command{

@@ -1,4 +1,4 @@
-module novshi-tech.com/atl
+module github.com/novshi-tech/atl-cli
 
 go 1.25.7
 

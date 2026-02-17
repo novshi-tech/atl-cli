@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"novshi-tech.com/atl/internal/adf"
+	"github.com/novshi-tech/atl-cli/internal/adf"
 )
 
 var issueViewCmd = &cobra.Command{

@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"strings"
 
-	"novshi-tech.com/atl/internal/adf"
-	"novshi-tech.com/atl/internal/auth"
+	"github.com/novshi-tech/atl-cli/internal/adf"
+	"github.com/novshi-tech/atl-cli/internal/auth"
 )
 
 // Client is an HTTP client for the Jira REST API v3.

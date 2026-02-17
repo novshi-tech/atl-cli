@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
-	"novshi-tech.com/atl/internal/auth"
+	"github.com/novshi-tech/atl-cli/internal/auth"
 )
 
 var configureCmd = &cobra.Command{

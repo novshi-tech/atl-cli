@@ -1,6 +1,6 @@
 package jira
 
-import "novshi-tech.com/atl/internal/adf"
+import "github.com/novshi-tech/atl-cli/internal/adf"
 
 // CreateIssueRequest is the request body for creating an issue.
 type CreateIssueRequest struct {

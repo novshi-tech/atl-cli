@@ -1,6 +1,6 @@
 package main
 
-import "novshi-tech.com/atl/cmd"
+import "github.com/novshi-tech/atl-cli/cmd"
 
 func main() {
 	cmd.Execute()

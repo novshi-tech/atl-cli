@@ -6,8 +6,8 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"novshi-tech.com/atl/internal/auth"
-	"novshi-tech.com/atl/internal/jira"
+	"github.com/novshi-tech/atl-cli/internal/auth"
+	"github.com/novshi-tech/atl-cli/internal/jira"
 )
 
 var rootCmd = &cobra.Command{
