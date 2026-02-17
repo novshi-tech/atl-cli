@@ -122,7 +122,7 @@ URL:       https://example.atlassian.net/browse/PROJ-123
 
 ## jira issue update
 
-既存の課題を更新する。`--summary`、`--description`、`--status` のいずれかを指定する。
+既存の課題を更新する。`--summary`、`--description`、`--status`、`--assignee` のいずれかを指定する。
 
 ```
 atl jira issue update [flags]
@@ -134,6 +134,7 @@ atl jira issue update [flags]
 | `--summary` | `-s` | No | - | 新しいサマリー |
 | `--description` | `-d` | No | - | 新しい説明 |
 | `--status` | - | No | - | 遷移先ステータス |
+| `--assignee` | - | No | - | 担当者の accountId（`none` で担当者解除） |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 
@@ -197,6 +198,41 @@ atl jira sprint issues [flags]
 | `--sprint` | - | Yes | - | スプリント ID |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
+
+## jira user search
+
+ユーザーを表示名またはメールアドレスで検索する。
+
+```
+atl jira user search [flags]
+```
+
+| フラグ | 短縮 | 必須 | デフォルト | 説明 |
+|--------|------|------|-----------|------|
+| `--query` | `-q` | Yes | - | 検索文字列（表示名・メールアドレス） |
+| `--max` | - | No | `50` | 最大取得件数 |
+| `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
+
+**出力例:**
+```
+Found 2 user(s):
+
+5b10ac8d14c052e1e6c2e251          John Doe                  john@example.com                active
+5b10a2844c20165700ede21g          Jane Smith                                                 active
+```
+
+**JSON 出力例** (`--json`):
+```json
+[
+  {
+    "accountId": "5b10ac8d14c052e1e6c2e251",
+    "displayName": "John Doe",
+    "emailAddress": "john@example.com",
+    "active": true
+  }
+]
+```
 
 ## configure
 

@@ -42,6 +42,13 @@ type JSONMutationResult struct {
 	URL string `json:"url"`
 }
 
+type JSONUserItem struct {
+	AccountID    string `json:"accountId"`
+	DisplayName  string `json:"displayName"`
+	EmailAddress string `json:"emailAddress,omitempty"`
+	Active       bool   `json:"active"`
+}
+
 type JSONRepoItem struct {
 	Slug      string `json:"slug"`
 	Name      string `json:"name"`

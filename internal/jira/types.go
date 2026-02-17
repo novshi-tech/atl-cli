@@ -39,6 +39,11 @@ type UpdateIssueFields struct {
 	Description *adf.Node `json:"description,omitempty"`
 }
 
+// AssignIssueRequest is the request body for assigning an issue.
+type AssignIssueRequest struct {
+	AccountID *string `json:"accountId"`
+}
+
 // AddCommentRequest is the request body for adding a comment.
 type AddCommentRequest struct {
 	Body adf.Node `json:"body"`
@@ -98,7 +103,10 @@ type IssueTypeInfo struct {
 }
 
 type User struct {
-	DisplayName string `json:"displayName"`
+	AccountID    string `json:"accountId"`
+	DisplayName  string `json:"displayName"`
+	EmailAddress string `json:"emailAddress,omitempty"`
+	Active       bool   `json:"active"`
 }
 
 type CommentResult struct {

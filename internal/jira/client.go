@@ -102,6 +102,13 @@ func (c *Client) TransitionIssue(key, targetStatus string) error {
 	return fmt.Errorf("no transition matching %q found; available: %s", targetStatus, strings.Join(available, ", "))
 }
 
+// AssignIssue assigns an issue to a user by accountId.
+// Pass nil to unassign.
+func (c *Client) AssignIssue(key string, accountID *string) error {
+	req := AssignIssueRequest{AccountID: accountID}
+	return c.doRequest("PUT", "/rest/api/3/issue/"+key+"/assignee", req, nil)
+}
+
 // AddComment adds a comment to an issue.
 func (c *Client) AddComment(key, body string) error {
 	req := AddCommentRequest{Body: adf.TextToADF(body)}
@@ -150,6 +157,17 @@ func (c *Client) GetSprintIssues(sprintID int) (*SprintIssuesResponse, error) {
 		return nil, err
 	}
 	return &resp, nil
+}
+
+// SearchUsers searches for users by display name or email address.
+func (c *Client) SearchUsers(query string, maxResults int) ([]User, error) {
+	path := fmt.Sprintf("/rest/api/3/user/search?query=%s&maxResults=%d",
+		urlEncode(query), maxResults)
+	var resp []User
+	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 func urlEncode(s string) string {
