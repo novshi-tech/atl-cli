@@ -133,3 +133,7 @@ atl bitbucket pr comment --workspace myws --repo myrepo --pr 42
 ```bash
 atl jira issue list --jql "project = MYPROJ" --json
 ```
+
+## ライセンス
+
+MIT License — 詳細は [LICENSE](LICENSE) を参照。
