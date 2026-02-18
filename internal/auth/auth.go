@@ -106,3 +106,40 @@ func AddSiteToList(store CredentialStore, alias string) error {
 	sites = append(sites, alias)
 	return store.Set("sites", strings.Join(sites, ","))
 }
+
+// RemoveSiteFromList removes a site alias from the sites list.
+func RemoveSiteFromList(store CredentialStore, alias string) error {
+	sites, err := ListSites(store)
+	if err != nil {
+		return err
+	}
+	filtered := sites[:0]
+	for _, s := range sites {
+		if s != alias {
+			filtered = append(filtered, s)
+		}
+	}
+	return store.Set("sites", strings.Join(filtered, ","))
+}
+
+// DeleteSite removes all credentials for the given site alias.
+func DeleteSite(store CredentialStore, alias string) error {
+	if err := store.Delete(alias + "/base-url"); err != nil {
+		return fmt.Errorf("deleting base-url: %w", err)
+	}
+	if err := store.Delete(alias + "/email"); err != nil {
+		return fmt.Errorf("deleting email: %w", err)
+	}
+	if err := store.Delete(alias + "/api-token"); err != nil {
+		return fmt.Errorf("deleting api-token: %w", err)
+	}
+	store.Delete(alias + "/bb-api-token") // optional, ignore error
+	if err := RemoveSiteFromList(store, alias); err != nil {
+		return fmt.Errorf("removing from site list: %w", err)
+	}
+	defaultSite, _ := GetDefaultSite(store)
+	if defaultSite == alias {
+		store.Delete("default-site")
+	}
+	return nil
+}
