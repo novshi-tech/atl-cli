@@ -45,8 +45,12 @@ atl configure --site mysite --default
 
 ### 2. API トークンの取得
 
-- **Jira**: https://id.atlassian.com/manage-profile/security/api-tokens
-- **Bitbucket**: https://bitbucket.org/account/settings/app-passwords/
+どちらも同じ Atlassian アカウント管理ページからトークンを発行します:
+
+https://id.atlassian.com/manage-profile/security/api-tokens
+
+- **Jira 用トークン**: 上記ページで発行したトークンをそのまま使用します。
+- **Bitbucket 用トークン**: 同じページでトークンを発行しますが、**Bitbucket 専用のスコープ（Repositories: Read/Write 等）を付与した別トークンを作成**してください。Jira 用トークンとは別に発行する必要があります。
 
 ### 3. 認証情報の保存先
 
