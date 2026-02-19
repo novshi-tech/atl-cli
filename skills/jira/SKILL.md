@@ -96,6 +96,18 @@ atl jira issue update --key PROJ-123 --summary "新サマリー" --status "Done"
 atl jira issue comment --key PROJ-123 --body "PR をレビューしてください"
 ```
 
+#### ユーザーへのメンション
+
+`@[表示名:accountId]` 構文でユーザーをメンションできる。accountId は `atl jira user search` で取得する。
+
+```bash
+# ユーザーの accountId を調べる
+atl jira user search --query "山田" --json
+
+# メンション付きコメントを投稿
+atl jira issue comment --key PROJ-123 --body "@[山田太郎:5b10ac8d14c052e1e6c2e251] 確認をお願いします。"
+```
+
 ## ユーザー検索
 
 ### ユーザーを検索する (`user search`)

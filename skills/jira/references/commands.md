@@ -153,6 +153,16 @@ atl jira issue comment [flags]
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 
+### メンション構文
+
+`--body` 内で `@[表示名:accountId]` 構文を使うと、Jira のメンション通知が送信される。
+
+```bash
+atl jira issue comment --key PROJ-123 --body "@[山田太郎:5b10ac8d14c052e1e6c2e251] 確認をお願いします。"
+```
+
+accountId は `atl jira user search --query "名前" --json` で取得できる。
+
 ## jira sprint list
 
 ボードのスプリント一覧を表示する。
