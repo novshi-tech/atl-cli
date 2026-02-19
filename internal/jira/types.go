@@ -153,3 +153,18 @@ func (e *APIError) String() string {
 	}
 	return msg
 }
+
+// ProjectSearchResponse is the response from the project search endpoint.
+type ProjectSearchResponse struct {
+	Values []Project `json:"values"`
+	Total  int       `json:"total"`
+	IsLast bool      `json:"isLast"`
+}
+
+// Project represents a Jira project.
+type Project struct {
+	ID             string `json:"id"`
+	Key            string `json:"key"`
+	Name           string `json:"name"`
+	ProjectTypeKey string `json:"projectTypeKey"`
+}

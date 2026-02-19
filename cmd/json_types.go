@@ -56,6 +56,12 @@ type JSONRepoItem struct {
 	IsPrivate bool   `json:"is_private"`
 }
 
+type JSONProjectItem struct {
+	Key  string `json:"key"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
 type JSONRepoDetail struct {
 	Slug        string `json:"slug"`
 	Name        string `json:"name"`
