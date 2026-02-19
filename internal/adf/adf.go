@@ -214,11 +214,12 @@ type inlineMatch struct {
 }
 
 var (
-	boldRe = regexp.MustCompile(`\*\*(.+?)\*\*`)
-	linkRe = regexp.MustCompile(`\[([^\]]+)\]\(([^)]+)\)`)
+	boldRe    = regexp.MustCompile(`\*\*(.+?)\*\*`)
+	linkRe    = regexp.MustCompile(`\[([^\]]+)\]\(([^)]+)\)`)
+	mentionRe = regexp.MustCompile(`@\[([^\]:]+):([^\]]+)\]`)
 )
 
-// parseInline splits text into ADF text nodes with marks for **bold** and [text](url).
+// parseInline splits text into ADF text nodes with marks for **bold**, [text](url), and @[name:accountId] mentions.
 func parseInline(text string) []Node {
 	if text == "" {
 		return nil
@@ -246,6 +247,19 @@ func parseInline(text string) []Node {
 				Type:  "text",
 				Text:  text[loc[2]:loc[3]],
 				Marks: []Mark{{Type: "link", Attrs: map[string]any{"href": text[loc[4]:loc[5]]}}},
+			},
+		})
+	}
+
+	for _, loc := range mentionRe.FindAllStringSubmatchIndex(text, -1) {
+		displayName := text[loc[2]:loc[3]]
+		accountID := text[loc[4]:loc[5]]
+		matches = append(matches, inlineMatch{
+			start: loc[0],
+			end:   loc[1],
+			node: Node{
+				Type:  "mention",
+				Attrs: map[string]any{"id": accountID, "text": "@" + displayName},
 			},
 		})
 	}
