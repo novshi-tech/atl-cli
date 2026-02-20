@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"syscall"
 
@@ -116,6 +117,17 @@ func promptSecret(label, current string) string {
 // terminal bracketed paste mode: ESC[200~ start, ESC[201~ end), or "(received)" for typed input.
 // The indicator appears right when input arrives, not after the user presses Enter.
 func readSecretDetectPaste() (string, error) {
+	// On Windows, always use fallback since MakeRaw and bracketed paste don't work reliably
+	if runtime.GOOS == "windows" {
+		b, e := term.ReadPassword(int(syscall.Stdin))
+		if len(b) > 0 {
+			fmt.Println(" (received)")
+		} else {
+			fmt.Println()
+		}
+		return string(b), e
+	}
+
 	fd := int(syscall.Stdin)
 
 	oldState, err := term.MakeRaw(fd)
@@ -163,7 +175,7 @@ func readSecretDetectPaste() (string, error) {
 	}
 
 	for {
-		n, readErr := syscall.Read(fd, oneByte)
+		n, readErr := syscall.Read(syscall.Handle(fd), oneByte)
 		if readErr != nil || n == 0 {
 			break
 		}
