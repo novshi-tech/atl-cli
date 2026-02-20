@@ -62,6 +62,15 @@ type JSONProjectItem struct {
 	Type string `json:"type"`
 }
 
+type JSONPRItem struct {
+	ID     int    `json:"id"`
+	Title  string `json:"title"`
+	State  string `json:"state"`
+	Author string `json:"author"`
+	Source string `json:"source"`
+	Dest   string `json:"destination"`
+}
+
 type JSONRepoDetail struct {
 	Slug        string `json:"slug"`
 	Name        string `json:"name"`

@@ -34,6 +34,14 @@ type RepositoriesResponse struct {
 	Values  []Repository `json:"values"`
 }
 
+// PullRequestsResponse is the paginated response for listing pull requests.
+type PullRequestsResponse struct {
+	PageLen int           `json:"pagelen"`
+	Size    int           `json:"size"`
+	Page    int           `json:"page"`
+	Values  []PullRequest `json:"values"`
+}
+
 // PullRequest represents a Bitbucket pull request.
 type PullRequest struct {
 	ID          int       `json:"id"`

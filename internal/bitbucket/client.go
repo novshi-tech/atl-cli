@@ -62,6 +62,19 @@ func (c *Client) GetRepository(workspace, repoSlug string) (*Repository, error) 
 	return &resp, nil
 }
 
+// ListPullRequests lists pull requests for a repository.
+func (c *Client) ListPullRequests(workspace, repoSlug, state string, page, pagelen int) (*PullRequestsResponse, error) {
+	path := fmt.Sprintf("/repositories/%s/%s/pullrequests?page=%d&pagelen=%d", workspace, repoSlug, page, pagelen)
+	if state != "" {
+		path += "&state=" + state
+	}
+	var resp PullRequestsResponse
+	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // CreatePullRequest creates a new pull request.
 func (c *Client) CreatePullRequest(workspace, repoSlug string, req CreatePRRequest) (*PullRequest, error) {
 	path := fmt.Sprintf("/repositories/%s/%s/pullrequests", workspace, repoSlug)
