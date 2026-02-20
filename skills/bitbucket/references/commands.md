@@ -77,6 +77,45 @@ Updated:      2024-06-15T10:30:00.000000+00:00
 }
 ```
 
+## bitbucket pr list
+
+リポジトリのプルリクエストを一覧表示する。
+
+```
+atl bitbucket pr list [flags]
+```
+
+| フラグ | 短縮 | 必須 | デフォルト | 説明 |
+|--------|------|------|-----------|------|
+| `--workspace` | - | Yes | - | ワークスペースのスラッグ |
+| `--repo` | - | Yes | - | リポジトリのスラッグ |
+| `--state` | - | No | `OPEN` | 状態フィルタ: `OPEN` / `MERGED` / `DECLINED` / `SUPERSEDED` |
+| `--max` | - | No | `25` | 最大取得件数 |
+| `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
+
+**出力例:**
+```
+Found 2 pull request(s):
+
+#42      OPEN        Alice               feature/auth→main       認証機能を追加
+#41      OPEN        Bob                 fix/login-bug→main      ログインバグを修正
+```
+
+**JSON 出力例** (`--json`):
+```json
+[
+  {
+    "id": 42,
+    "title": "認証機能を追加",
+    "state": "OPEN",
+    "author": "Alice",
+    "source": "feature/auth",
+    "dest": "main"
+  }
+]
+```
+
 ## bitbucket pr create
 
 新しいプルリクエストを作成する。

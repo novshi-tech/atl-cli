@@ -1,13 +1,13 @@
 ---
 name: bitbucket
-description: Bitbucket Cloud の操作を行うスキル。リポジトリの一覧・詳細表示、プルリクエストの作成・コメント取得をサポート。「Bitbucketのリポジトリを一覧して」「PRを作成して」「PRのコメントを確認して」など Bitbucket 関連の操作を依頼された場合に使用。
+description: Bitbucket Cloud の操作を行うスキル。リポジトリの一覧・詳細表示、プルリクエストの一覧・作成・コメント取得をサポート。「Bitbucketのリポジトリを一覧して」「PRを一覧して」「PRを作成して」「PRのコメントを確認して」など Bitbucket 関連の操作を依頼された場合に使用。
 ---
 
 # Bitbucket
 
 ## Overview
 
-`atl bitbucket` を使って Bitbucket Cloud を操作するスキル。リポジトリの一覧・詳細取得、プルリクエストの作成・コメント取得をコマンドラインから実行できる。
+`atl bitbucket` を使って Bitbucket Cloud を操作するスキル。リポジトリの一覧・詳細取得、プルリクエストの一覧・作成・コメント取得をコマンドラインから実行できる。
 
 ## Quick Start
 
@@ -19,6 +19,9 @@ atl bitbucket repo list --workspace myteam
 
 # リポジトリの詳細を表示
 atl bitbucket repo get --workspace myteam --repo my-app
+
+# プルリクエストを一覧
+atl bitbucket pr list --workspace myteam --repo my-app
 
 # プルリクエストを作成
 atl bitbucket pr create --workspace myteam --repo my-app --title "新機能追加" --source feature/new-feature
@@ -55,6 +58,24 @@ atl bitbucket repo get --workspace myteam --repo my-app
 - `--repo` - リポジトリのスラッグ（必須）
 
 ## プルリクエスト操作
+
+### プルリクエストを一覧する (`pr list`)
+
+リポジトリのプルリクエストを一覧表示する。
+
+```bash
+# オープンなPRを一覧（デフォルト）
+atl bitbucket pr list --workspace myteam --repo my-app
+
+# マージ済みPRを一覧
+atl bitbucket pr list --workspace myteam --repo my-app --state MERGED
+```
+
+**フラグ:**
+- `--workspace` - ワークスペースのスラッグ（必須）
+- `--repo` - リポジトリのスラッグ（必須）
+- `--state` - 状態でフィルタ: `OPEN` / `MERGED` / `DECLINED` / `SUPERSEDED`（デフォルト: OPEN）
+- `--max` - 最大件数（デフォルト: 25）
 
 ### プルリクエストを作成する (`pr create`)
 
