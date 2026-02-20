@@ -120,7 +120,7 @@ func defaultSkillsPath() (string, error) {
 }
 
 func installSkill(skill, destDir string, dryRun bool) error {
-	srcRoot := filepath.Join("skills", skill)
+	srcRoot := "skills/" + skill
 	return fs.WalkDir(skillsFS, srcRoot, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -128,11 +128,8 @@ func installSkill(skill, destDir string, dryRun bool) error {
 
 		// path is "skills/<skill>/..." — strip the leading "skills/" to get the relative path
 		// so files end up at destDir/<skill>/...
-		rel, err := filepath.Rel("skills", path)
-		if err != nil {
-			return err
-		}
-		dest := filepath.Join(destDir, rel)
+		rel := strings.TrimPrefix(path, "skills/")
+		dest := filepath.Join(destDir, filepath.FromSlash(rel))
 
 		if d.IsDir() {
 			if dryRun {

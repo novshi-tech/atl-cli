@@ -128,12 +128,12 @@ func readSecretDetectPaste() (string, error) {
 		return string(b), e
 	}
 
-	fd := int(syscall.Stdin)
+	fd := syscall.Handle(syscall.Stdin)
 
-	oldState, err := term.MakeRaw(fd)
+	oldState, err := term.MakeRaw(int(fd))
 	if err != nil {
 		// Fallback: use standard ReadPassword; indicator shows only after Enter.
-		b, e := term.ReadPassword(fd)
+		b, e := term.ReadPassword(int(fd))
 		if len(b) > 0 {
 			fmt.Println(" (received)")
 		} else {
@@ -141,7 +141,7 @@ func readSecretDetectPaste() (string, error) {
 		}
 		return string(b), e
 	}
-	defer term.Restore(fd, oldState)
+	defer term.Restore(int(fd), oldState)
 
 	// Enable bracketed paste mode; disable it on return.
 	fmt.Fprint(os.Stdout, "\x1b[?2004h")
@@ -175,7 +175,7 @@ func readSecretDetectPaste() (string, error) {
 	}
 
 	for {
-		n, readErr := syscall.Read(syscall.Handle(fd), oneByte)
+		n, readErr := syscall.Read(fd, oneByte)
 		if readErr != nil || n == 0 {
 			break
 		}
