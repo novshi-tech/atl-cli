@@ -16,6 +16,7 @@ type JSONIssueDetail struct {
 	Assignee    string            `json:"assignee"`
 	URL         string            `json:"url"`
 	Description string            `json:"description"`
+	DueDate     string            `json:"duedate,omitempty"`
 	Comments    []JSONCommentItem `json:"comments,omitempty"`
 }
 

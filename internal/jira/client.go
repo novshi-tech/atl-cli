@@ -134,7 +134,7 @@ func (c *Client) SearchIssues(jql string, maxResults int) (*SearchResponse, erro
 
 // GetIssue retrieves a single issue with full details.
 func (c *Client) GetIssue(key string) (*Issue, error) {
-	path := fmt.Sprintf("/rest/api/3/issue/%s?fields=summary,status,issuetype,assignee,description,comment", key)
+	path := fmt.Sprintf("/rest/api/3/issue/%s?fields=summary,status,issuetype,assignee,description,comment,duedate", key)
 	var resp Issue
 	if err := c.doRequest("GET", path, nil, &resp); err != nil {
 		return nil, err

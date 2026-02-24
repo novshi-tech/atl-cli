@@ -46,6 +46,7 @@ func runIssueView(cmd *cobra.Command, args []string) error {
 			Type:     issue.Fields.IssueType.Name,
 			Assignee: assignee,
 			URL:      fmt.Sprintf("%s/browse/%s", client.BaseURL(), issue.Key),
+			DueDate:  issue.Fields.DueDate,
 		}
 		if issue.Fields.Description != nil {
 			detail.Description = adfToText(issue.Fields.Description)
@@ -67,6 +68,9 @@ func runIssueView(cmd *cobra.Command, args []string) error {
 	fmt.Printf("Status:    %s\n", issue.Fields.Status.Name)
 	fmt.Printf("Type:      %s\n", issue.Fields.IssueType.Name)
 	fmt.Printf("Assignee:  %s\n", assignee)
+	if issue.Fields.DueDate != "" {
+		fmt.Printf("Due:       %s\n", issue.Fields.DueDate)
+	}
 	fmt.Printf("URL:       %s/browse/%s\n", client.BaseURL(), issue.Key)
 
 	if issue.Fields.Description != nil {

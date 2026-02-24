@@ -94,6 +94,7 @@ type IssueFields struct {
 	Assignee    *User          `json:"assignee"`
 	Description *adf.Node      `json:"description"`
 	Comment     *CommentResult `json:"comment"`
+	DueDate     string         `json:"duedate,omitempty"`
 }
 
 type Status struct {
