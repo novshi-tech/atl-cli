@@ -19,6 +19,7 @@ func init() {
 	issueUpdateCmd.Flags().StringP("description", "d", "", "New description")
 	issueUpdateCmd.Flags().String("status", "", "Transition to this status")
 	issueUpdateCmd.Flags().String("assignee", "", "Assignee account ID (use \"none\" to unassign)")
+	issueUpdateCmd.Flags().String("due", "", "Due date (YYYY-MM-DD)")
 	issueCmd.AddCommand(issueUpdateCmd)
 }
 
@@ -34,18 +35,19 @@ func runIssueUpdate(cmd *cobra.Command, args []string) error {
 	status, _ := cmd.Flags().GetString("status")
 	assignee, _ := cmd.Flags().GetString("assignee")
 	assigneeChanged := cmd.Flags().Changed("assignee")
+	due, _ := cmd.Flags().GetString("due")
 
-	if summary == "" && description == "" && status == "" && !assigneeChanged {
+	if summary == "" && description == "" && status == "" && !assigneeChanged && due == "" {
 		if jsonMode(cmd) {
 			return printJSON(JSONMutationResult{Key: key, URL: fmt.Sprintf("%s/browse/%s", client.BaseURL(), key)})
 		}
-		fmt.Println("Nothing to update. Specify --summary, --description, --status, or --assignee.")
+		fmt.Println("Nothing to update. Specify --summary, --description, --status, --assignee, or --due.")
 		fmt.Printf("URL: %s/browse/%s\n", client.BaseURL(), key)
 		return nil
 	}
 
-	if summary != "" || description != "" {
-		if err := client.UpdateIssue(key, summary, description); err != nil {
+	if summary != "" || description != "" || due != "" {
+		if err := client.UpdateIssue(key, summary, description, due); err != nil {
 			return err
 		}
 		if !jsonMode(cmd) {

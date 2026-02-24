@@ -19,6 +19,7 @@ func init() {
 	issueCreateCmd.MarkFlagRequired("summary")
 	issueCreateCmd.Flags().StringP("type", "t", "Task", "Issue type")
 	issueCreateCmd.Flags().StringP("description", "d", "", "Issue description")
+	issueCreateCmd.Flags().String("due", "", "Due date (YYYY-MM-DD)")
 	issueCmd.AddCommand(issueCreateCmd)
 }
 
@@ -32,8 +33,9 @@ func runIssueCreate(cmd *cobra.Command, args []string) error {
 	summary, _ := cmd.Flags().GetString("summary")
 	issueType, _ := cmd.Flags().GetString("type")
 	description, _ := cmd.Flags().GetString("description")
+	due, _ := cmd.Flags().GetString("due")
 
-	resp, err := client.CreateIssue(project, issueType, summary, description)
+	resp, err := client.CreateIssue(project, issueType, summary, description, due)
 	if err != nil {
 		return err
 	}

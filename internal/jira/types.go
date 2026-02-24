@@ -12,6 +12,7 @@ type CreateIssueFields struct {
 	Summary     string     `json:"summary"`
 	IssueType   IssueType  `json:"issuetype"`
 	Description *adf.Node  `json:"description,omitempty"`
+	DueDate     string     `json:"duedate,omitempty"`
 }
 
 type ProjectKey struct {
@@ -37,6 +38,7 @@ type UpdateIssueRequest struct {
 type UpdateIssueFields struct {
 	Summary     string    `json:"summary,omitempty"`
 	Description *adf.Node `json:"description,omitempty"`
+	DueDate     string    `json:"duedate,omitempty"`
 }
 
 // AssignIssueRequest is the request body for assigning an issue.

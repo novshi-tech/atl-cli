@@ -46,7 +46,7 @@ func (c *Client) BaseURL() string {
 }
 
 // CreateIssue creates a new issue.
-func (c *Client) CreateIssue(project, issueType, summary, description string) (*CreateIssueResponse, error) {
+func (c *Client) CreateIssue(project, issueType, summary, description, dueDate string) (*CreateIssueResponse, error) {
 	req := CreateIssueRequest{
 		Fields: CreateIssueFields{
 			Project:   ProjectKey{Key: project},
@@ -58,6 +58,9 @@ func (c *Client) CreateIssue(project, issueType, summary, description string) (*
 		desc := adf.TextToADF(description)
 		req.Fields.Description = &desc
 	}
+	if dueDate != "" {
+		req.Fields.DueDate = dueDate
+	}
 
 	var resp CreateIssueResponse
 	if err := c.doRequest("POST", "/rest/api/3/issue", req, &resp); err != nil {
@@ -66,8 +69,8 @@ func (c *Client) CreateIssue(project, issueType, summary, description string) (*
 	return &resp, nil
 }
 
-// UpdateIssue updates an existing issue's summary and/or description.
-func (c *Client) UpdateIssue(key, summary, description string) error {
+// UpdateIssue updates an existing issue's summary, description, and/or due date.
+func (c *Client) UpdateIssue(key, summary, description, dueDate string) error {
 	fields := UpdateIssueFields{}
 	if summary != "" {
 		fields.Summary = summary
@@ -75,6 +78,9 @@ func (c *Client) UpdateIssue(key, summary, description string) error {
 	if description != "" {
 		desc := adf.TextToADF(description)
 		fields.Description = &desc
+	}
+	if dueDate != "" {
+		fields.DueDate = dueDate
 	}
 	req := UpdateIssueRequest{Fields: fields}
 	return c.doRequest("PUT", "/rest/api/3/issue/"+key, req, nil)
