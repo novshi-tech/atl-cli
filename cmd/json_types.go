@@ -50,6 +50,14 @@ type JSONUserItem struct {
 	Active       bool   `json:"active"`
 }
 
+type JSONBBUserItem struct {
+	AccountID   string `json:"accountId"`
+	DisplayName string `json:"displayName"`
+	Nickname    string `json:"nickname"`
+	UUID        string `json:"uuid"`
+	CreatedOn   string `json:"createdOn"`
+}
+
 type JSONRepoItem struct {
 	Slug      string `json:"slug"`
 	Name      string `json:"name"`

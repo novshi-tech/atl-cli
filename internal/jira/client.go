@@ -178,6 +178,15 @@ func (c *Client) ListProjects(query string, maxResults int) (*ProjectSearchRespo
 	return &resp, nil
 }
 
+// GetMyself returns the currently authenticated user.
+func (c *Client) GetMyself() (*User, error) {
+	var resp User
+	if err := c.doRequest("GET", "/rest/api/3/myself", nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // SearchUsers searches for users by display name or email address.
 func (c *Client) SearchUsers(query string, maxResults int) ([]User, error) {
 	path := fmt.Sprintf("/rest/api/3/user/search?query=%s&maxResults=%d",

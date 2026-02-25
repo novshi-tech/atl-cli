@@ -42,6 +42,15 @@ func NewClientFromStore(store auth.CredentialStore, siteAlias string) (*Client, 
 	return NewClient(creds), nil
 }
 
+// GetCurrentUser returns the currently authenticated user.
+func (c *Client) GetCurrentUser() (*BBUser, error) {
+	var resp BBUser
+	if err := c.doRequest("GET", "/user", nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // ListRepositories lists repositories for a workspace.
 func (c *Client) ListRepositories(workspace string, page, pagelen int) (*RepositoriesResponse, error) {
 	path := fmt.Sprintf("/repositories/%s?page=%d&pagelen=%d", workspace, page, pagelen)

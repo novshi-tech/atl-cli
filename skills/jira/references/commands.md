@@ -1,5 +1,36 @@
 # atl コマンドリファレンス
 
+## jira me
+
+認証済みの Jira ユーザー（自分自身）のアカウント情報を表示する。
+
+```
+atl jira me [flags]
+```
+
+| フラグ | 短縮 | 必須 | デフォルト | 説明 |
+|--------|------|------|-----------|------|
+| `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
+
+**出力例:**
+```
+Account ID:  5b10ac8d14c052e1e6c2e251
+Name:        John Doe
+Email:       john@example.com
+Active:      active
+```
+
+**JSON 出力例** (`--json`):
+```json
+{
+  "accountId": "5b10ac8d14c052e1e6c2e251",
+  "displayName": "John Doe",
+  "emailAddress": "john@example.com",
+  "active": true
+}
+```
+
 ## jira issue create
 
 新しい Jira 課題を作成する。

@@ -1,5 +1,38 @@
 # atl bitbucket コマンドリファレンス
 
+## bitbucket me
+
+認証済みの Bitbucket ユーザー（自分自身）のアカウント情報を表示する。
+
+```
+atl bitbucket me [flags]
+```
+
+| フラグ | 短縮 | 必須 | デフォルト | 説明 |
+|--------|------|------|-----------|------|
+| `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
+
+**出力例:**
+```
+Account ID:    5b10ac8d14c052e1e6c2e251
+Display Name:  John Doe
+Nickname:      johndoe
+UUID:          {1234-5678-abcd}
+Created On:    2020-01-15T10:30:00.000000+00:00
+```
+
+**JSON 出力例** (`--json`):
+```json
+{
+  "accountId": "5b10ac8d14c052e1e6c2e251",
+  "displayName": "John Doe",
+  "nickname": "johndoe",
+  "uuid": "{1234-5678-abcd}",
+  "createdOn": "2020-01-15T10:30:00.000000+00:00"
+}
+```
+
 ## bitbucket repo list
 
 ワークスペース内のリポジトリを一覧表示する。

@@ -121,6 +121,15 @@ type PRCommentsResponse struct {
 	Next    string      `json:"next"`
 }
 
+// BBUser represents the authenticated Bitbucket user.
+type BBUser struct {
+	DisplayName string `json:"display_name"`
+	Nickname    string `json:"nickname"`
+	AccountID   string `json:"account_id"`
+	UUID        string `json:"uuid"`
+	CreatedOn   string `json:"created_on"`
+}
+
 // APIError represents an error response from the Bitbucket API.
 type APIError struct {
 	Error APIErrorDetail `json:"error"`
