@@ -28,6 +28,7 @@ type Mark struct {
 //   - ||h1||h2||       → table header row
 //   - |c1|c2|          → table data row
 //   - **bold**         → strong mark
+//   - *italic*        → em mark
 //   - [text](url)      → link mark
 //   - blank lines      → empty paragraph
 func TextToADF(text string) Node {
@@ -206,7 +207,7 @@ func makeParagraph(text string) Node {
 	}
 }
 
-// --- Inline parsing (bold, links) ---
+// --- Inline parsing (bold, italic, links) ---
 
 type inlineMatch struct {
 	start, end int
@@ -215,11 +216,12 @@ type inlineMatch struct {
 
 var (
 	boldRe    = regexp.MustCompile(`\*\*(.+?)\*\*`)
+	italicRe  = regexp.MustCompile(`\*([^\s*][^*]*?)\*`)
 	linkRe    = regexp.MustCompile(`\[([^\]]+)\]\(([^)]+)\)`)
 	mentionRe = regexp.MustCompile(`@\[([^\]:]+):([^\]]+)\]`)
 )
 
-// parseInline splits text into ADF text nodes with marks for **bold**, [text](url), and @[name:accountId] mentions.
+// parseInline splits text into ADF text nodes with marks for **bold**, *italic*, [text](url), and @[name:accountId] mentions.
 func parseInline(text string) []Node {
 	if text == "" {
 		return nil
@@ -235,6 +237,18 @@ func parseInline(text string) []Node {
 				Type:  "text",
 				Text:  text[loc[2]:loc[3]],
 				Marks: []Mark{{Type: "strong"}},
+			},
+		})
+	}
+
+	for _, loc := range italicRe.FindAllStringSubmatchIndex(text, -1) {
+		matches = append(matches, inlineMatch{
+			start: loc[0],
+			end:   loc[1],
+			node: Node{
+				Type:  "text",
+				Text:  text[loc[2]:loc[3]],
+				Marks: []Mark{{Type: "em"}},
 			},
 		})
 	}
