@@ -46,6 +46,9 @@ func newJiraClient(cmd *cobra.Command) (*jira.Client, error) {
 
 	site, _ := cmd.Flags().GetString("site")
 	if site == "" {
+		site = os.Getenv("ATL_SITE")
+	}
+	if site == "" {
 		site, err = auth.GetDefaultSite(store)
 		if err != nil {
 			return nil, fmt.Errorf("no --site specified and no default site configured; run 'atl configure --site <name>' first")
@@ -63,6 +66,9 @@ func newBitbucketClient(cmd *cobra.Command) (*bitbucket.Client, error) {
 	}
 
 	site, _ := cmd.Flags().GetString("site")
+	if site == "" {
+		site = os.Getenv("ATL_SITE")
+	}
 	if site == "" {
 		site, err = auth.GetDefaultSite(store)
 		if err != nil {
