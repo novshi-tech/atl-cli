@@ -110,6 +110,27 @@ atl bitbucket pr comment --workspace myteam --repo my-app --pr 42
 - `--repo` - リポジトリのスラッグ（必須）
 - `--pr` - プルリクエスト ID（必須）
 
+### PRにコメントを投稿する（API直接呼び出し）
+
+`atl bitbucket` にはPRコメント投稿コマンドがないため、Bitbucket REST API を直接呼び出す。認証情報は `atl configure` で設定済みのものを使用する。
+
+```bash
+# 認証情報を取得
+BASE_URL=$(atl auth get --field base-url --json | jq -r '.value')
+EMAIL=$(atl auth get --field email --json | jq -r '.value')
+BB_TOKEN=$(atl auth get --field bb-api-token --json | jq -r '.value')
+
+# PRにコメントを投稿
+curl -s -u "${EMAIL}:${BB_TOKEN}" \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"content": {"raw": "🤖 レビューコメントです"}}' \
+  "https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pullrequests/{pr_id}/comments"
+```
+
+> **Note:** Claude（AIエージェント）からコメントを投稿する場合は、本文の先頭に `🤖 ` を付与すること。
+> 例: `{"content": {"raw": "🤖 CI が通りました"}}`
+
 ## 共通フラグ
 
 すべてのサブコマンドで以下のフラグが使用可能:
