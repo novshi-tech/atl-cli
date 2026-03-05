@@ -13,8 +13,7 @@ var bbPRListCmd = &cobra.Command{
 }
 
 func init() {
-	bbPRListCmd.Flags().String("workspace", "", "Workspace slug (required)")
-	bbPRListCmd.MarkFlagRequired("workspace")
+	bbPRListCmd.Flags().String("workspace", "", "Workspace slug")
 	bbPRListCmd.Flags().String("repo", "", "Repository slug (required)")
 	bbPRListCmd.MarkFlagRequired("repo")
 	bbPRListCmd.Flags().String("state", "", "Filter by state: OPEN, MERGED, DECLINED, SUPERSEDED (default: OPEN)")
@@ -28,7 +27,10 @@ func runBBPRList(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	workspace, _ := cmd.Flags().GetString("workspace")
+	workspace, err := resolveBBWorkspace(cmd)
+	if err != nil {
+		return err
+	}
 	repo, _ := cmd.Flags().GetString("repo")
 	state, _ := cmd.Flags().GetString("state")
 	max, _ := cmd.Flags().GetInt("max")

@@ -14,8 +14,7 @@ var bbPRCreateCmd = &cobra.Command{
 }
 
 func init() {
-	bbPRCreateCmd.Flags().String("workspace", "", "Workspace slug (required)")
-	bbPRCreateCmd.MarkFlagRequired("workspace")
+	bbPRCreateCmd.Flags().String("workspace", "", "Workspace slug")
 	bbPRCreateCmd.Flags().String("repo", "", "Repository slug (required)")
 	bbPRCreateCmd.MarkFlagRequired("repo")
 	bbPRCreateCmd.Flags().String("title", "", "Pull request title (required)")
@@ -33,7 +32,10 @@ func runBBPRCreate(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	workspace, _ := cmd.Flags().GetString("workspace")
+	workspace, err := resolveBBWorkspace(cmd)
+	if err != nil {
+		return err
+	}
 	repo, _ := cmd.Flags().GetString("repo")
 	title, _ := cmd.Flags().GetString("title")
 	source, _ := cmd.Flags().GetString("source")

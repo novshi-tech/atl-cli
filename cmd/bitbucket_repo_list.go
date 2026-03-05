@@ -13,8 +13,7 @@ var bbRepoListCmd = &cobra.Command{
 }
 
 func init() {
-	bbRepoListCmd.Flags().String("workspace", "", "Workspace slug (required)")
-	bbRepoListCmd.MarkFlagRequired("workspace")
+	bbRepoListCmd.Flags().String("workspace", "", "Workspace slug")
 	bbRepoListCmd.Flags().Int("max", 25, "Maximum number of results")
 	bbRepoCmd.AddCommand(bbRepoListCmd)
 }
@@ -25,7 +24,10 @@ func runBBRepoList(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	workspace, _ := cmd.Flags().GetString("workspace")
+	workspace, err := resolveBBWorkspace(cmd)
+	if err != nil {
+		return err
+	}
 	max, _ := cmd.Flags().GetInt("max")
 
 	resp, err := client.ListRepositories(workspace, 1, max)

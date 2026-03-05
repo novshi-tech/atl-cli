@@ -18,6 +18,7 @@ type SiteCredentials struct {
 	Email         string
 	APIToken      string
 	BBAPIToken string // Bitbucket API Token (optional, used instead of APIToken for Bitbucket)
+	BBWorkspace string // Bitbucket Workspace slug (optional, restricts workspace usage)
 }
 
 // NewStore returns a CredentialStore, trying keyring first, then falling back to pass.
@@ -49,6 +50,11 @@ func SaveSite(store CredentialStore, alias string, creds SiteCredentials) error 
 			return fmt.Errorf("saving bb-api-token: %w", err)
 		}
 	}
+	if creds.BBWorkspace != "" {
+		if err := store.Set(alias+"/bb-workspace", creds.BBWorkspace); err != nil {
+			return fmt.Errorf("saving bb-workspace: %w", err)
+		}
+	}
 	return nil
 }
 
@@ -67,7 +73,8 @@ func LoadSite(store CredentialStore, alias string) (SiteCredentials, error) {
 		return SiteCredentials{}, fmt.Errorf("loading api-token for site %q: %w", alias, err)
 	}
 	bbAPIToken, _ := store.Get(alias + "/bb-api-token") // optional, ignore error
-	return SiteCredentials{BaseURL: url, Email: email, APIToken: token, BBAPIToken: bbAPIToken}, nil
+	bbWorkspace, _ := store.Get(alias + "/bb-workspace") // optional, ignore error
+	return SiteCredentials{BaseURL: url, Email: email, APIToken: token, BBAPIToken: bbAPIToken, BBWorkspace: bbWorkspace}, nil
 }
 
 // GetDefaultSite returns the default site alias.
@@ -134,6 +141,7 @@ func DeleteSite(store CredentialStore, alias string) error {
 		return fmt.Errorf("deleting api-token: %w", err)
 	}
 	store.Delete(alias + "/bb-api-token") // optional, ignore error
+	store.Delete(alias + "/bb-workspace") // optional, ignore error
 	if err := RemoveSiteFromList(store, alias); err != nil {
 		return fmt.Errorf("removing from site list: %w", err)
 	}

@@ -13,8 +13,7 @@ var bbRepoGetCmd = &cobra.Command{
 }
 
 func init() {
-	bbRepoGetCmd.Flags().String("workspace", "", "Workspace slug (required)")
-	bbRepoGetCmd.MarkFlagRequired("workspace")
+	bbRepoGetCmd.Flags().String("workspace", "", "Workspace slug")
 	bbRepoGetCmd.Flags().String("repo", "", "Repository slug (required)")
 	bbRepoGetCmd.MarkFlagRequired("repo")
 	bbRepoCmd.AddCommand(bbRepoGetCmd)
@@ -26,7 +25,10 @@ func runBBRepoGet(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	workspace, _ := cmd.Flags().GetString("workspace")
+	workspace, err := resolveBBWorkspace(cmd)
+	if err != nil {
+		return err
+	}
 	repo, _ := cmd.Flags().GetString("repo")
 
 	r, err := client.GetRepository(workspace, repo)
