@@ -26,6 +26,15 @@ type JSONCommentItem struct {
 	Body    string `json:"body"`
 }
 
+type JSONInlineCommentItem struct {
+	Author  string `json:"author"`
+	Created string `json:"created"`
+	Path    string `json:"path"`
+	From    *int   `json:"from,omitempty"`
+	To      *int   `json:"to,omitempty"`
+	Body    string `json:"body"`
+}
+
 type JSONSprintItem struct {
 	ID    int    `json:"id"`
 	Name  string `json:"name"`

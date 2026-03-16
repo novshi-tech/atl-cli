@@ -184,7 +184,7 @@ URL: https://bitbucket.org/myteam/my-app/pull-requests/42
 
 ## bitbucket pr comment
 
-プルリクエストのコメントを一覧表示する。インラインコードレビューコメントは除外される。
+プルリクエストのコメントを一覧表示する。デフォルトではインラインコードレビューコメントは除外される。
 
 ```
 atl bitbucket pr comment [flags]
@@ -195,6 +195,7 @@ atl bitbucket pr comment [flags]
 | `--workspace` | - | No | サイト設定値 | ワークスペースのスラッグ（サイト設定で制限） |
 | `--repo` | - | Yes | - | リポジトリのスラッグ |
 | `--pr` | - | Yes | - | プルリクエスト ID |
+| `--inline` | - | No | `false` | インラインコードレビューコメントも含める |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 
@@ -209,6 +210,19 @@ LGTM! マージしてください。
 修正を確認しました。
 ```
 
+**出力例** (`--inline`):
+```
+Found 2 comment(s):
+
+[2024-06-15T10:30:00.000000+00:00] John Doe:
+LGTM! マージしてください。
+
+Found 1 inline comment(s):
+
+[2024-06-15T09:00:00.000000+00:00] Alice on src/auth.go (lines 42-45):
+この変数名はもう少し分かりやすくした方が良いです。
+```
+
 **JSON 出力例** (`--json`):
 ```json
 [
@@ -218,4 +232,27 @@ LGTM! マージしてください。
     "body": "LGTM! マージしてください。"
   }
 ]
+```
+
+**JSON 出力例** (`--json --inline`):
+```json
+{
+  "comments": [
+    {
+      "author": "John Doe",
+      "created": "2024-06-15T10:30:00.000000+00:00",
+      "body": "LGTM! マージしてください。"
+    }
+  ],
+  "inline_comments": [
+    {
+      "author": "Alice",
+      "created": "2024-06-15T09:00:00.000000+00:00",
+      "path": "src/auth.go",
+      "from": 42,
+      "to": 45,
+      "body": "この変数名はもう少し分かりやすくした方が良いです。"
+    }
+  ]
+}
 ```
