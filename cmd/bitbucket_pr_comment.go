@@ -18,6 +18,7 @@ func init() {
 	bbPRCommentCmd.MarkFlagRequired("repo")
 	bbPRCommentCmd.Flags().Int("pr", 0, "Pull request ID (required)")
 	bbPRCommentCmd.MarkFlagRequired("pr")
+	bbPRCommentCmd.Flags().Bool("inline", false, "Include inline code review comments")
 	bbPRCmd.AddCommand(bbPRCommentCmd)
 }
 
@@ -33,27 +34,30 @@ func runBBPRComment(cmd *cobra.Command, args []string) error {
 	}
 	repo, _ := cmd.Flags().GetString("repo")
 	prID, _ := cmd.Flags().GetInt("pr")
+	showInline, _ := cmd.Flags().GetBool("inline")
 
 	resp, err := client.ListPRComments(workspace, repo, prID)
 	if err != nil {
 		return err
 	}
 
-	// Filter out inline comments (code review comments)
-	var comments []struct {
-		Author  string
-		Created string
-		Body    string
-	}
+	var comments []JSONCommentItem
+	var inlineComments []JSONInlineCommentItem
 	for _, c := range resp.Values {
 		if c.Inline != nil {
+			if showInline {
+				inlineComments = append(inlineComments, JSONInlineCommentItem{
+					Author:  c.User.DisplayName,
+					Created: c.CreatedOn,
+					Path:    c.Inline.Path,
+					From:    c.Inline.From,
+					To:      c.Inline.To,
+					Body:    c.Content.Raw,
+				})
+			}
 			continue
 		}
-		comments = append(comments, struct {
-			Author  string
-			Created string
-			Body    string
-		}{
+		comments = append(comments, JSONCommentItem{
 			Author:  c.User.DisplayName,
 			Created: c.CreatedOn,
 			Body:    c.Content.Raw,
@@ -61,25 +65,44 @@ func runBBPRComment(cmd *cobra.Command, args []string) error {
 	}
 
 	if jsonMode(cmd) {
-		items := make([]JSONCommentItem, len(comments))
-		for i, c := range comments {
-			items[i] = JSONCommentItem{
-				Author:  c.Author,
-				Created: c.Created,
-				Body:    c.Body,
-			}
+		if showInline {
+			return printJSON(struct {
+				Comments       []JSONCommentItem       `json:"comments"`
+				InlineComments []JSONInlineCommentItem `json:"inline_comments"`
+			}{comments, inlineComments})
 		}
-		return printJSON(items)
+		return printJSON(comments)
 	}
 
-	if len(comments) == 0 {
+	if len(comments) == 0 && (!showInline || len(inlineComments) == 0) {
 		fmt.Println("No comments found.")
 		return nil
 	}
 
-	fmt.Printf("Found %d comment(s):\n\n", len(comments))
-	for _, c := range comments {
-		fmt.Printf("[%s] %s:\n%s\n\n", c.Created, c.Author, c.Body)
+	if len(comments) > 0 {
+		fmt.Printf("Found %d comment(s):\n\n", len(comments))
+		for _, c := range comments {
+			fmt.Printf("[%s] %s:\n%s\n\n", c.Created, c.Author, c.Body)
+		}
 	}
+
+	if showInline && len(inlineComments) > 0 {
+		fmt.Printf("Found %d inline comment(s):\n\n", len(inlineComments))
+		for _, c := range inlineComments {
+			lineRef := prInlineLineRef(c.From, c.To)
+			fmt.Printf("[%s] %s on %s%s:\n%s\n\n", c.Created, c.Author, c.Path, lineRef, c.Body)
+		}
+	}
+
 	return nil
+}
+
+func prInlineLineRef(from, to *int) string {
+	if from != nil && to != nil {
+		return fmt.Sprintf(" (lines %d-%d)", *from, *to)
+	}
+	if to != nil {
+		return fmt.Sprintf(" (line %d)", *to)
+	}
+	return ""
 }
