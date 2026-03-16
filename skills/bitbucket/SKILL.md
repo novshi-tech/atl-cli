@@ -22,11 +22,11 @@ atl bitbucket pr list --repo my-app
 # プルリクエストを作成
 atl bitbucket pr create --repo my-app --title "新機能追加" --source feature/new-feature
 
-# PRのコメントを取得
+# PRのコメントを取得（インラインコメントもデフォルトで含まれる）
 atl bitbucket pr comment --repo my-app --pr 42
 
-# PRのインラインコードレビューコメントも含めて取得
-atl bitbucket pr comment --repo my-app --pr 42 --inline
+# インラインコメントを除外して取得
+atl bitbucket pr comment --repo my-app --pr 42 --inline=false
 ```
 
 ## ワークスペースの解決

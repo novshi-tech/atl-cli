@@ -18,7 +18,7 @@ func init() {
 	bbPRCommentCmd.MarkFlagRequired("repo")
 	bbPRCommentCmd.Flags().Int("pr", 0, "Pull request ID (required)")
 	bbPRCommentCmd.MarkFlagRequired("pr")
-	bbPRCommentCmd.Flags().Bool("inline", false, "Include inline code review comments")
+	bbPRCommentCmd.Flags().Bool("inline", true, "Include inline code review comments")
 	bbPRCmd.AddCommand(bbPRCommentCmd)
 }
 

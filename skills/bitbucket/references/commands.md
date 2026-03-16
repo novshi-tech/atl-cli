@@ -184,7 +184,7 @@ URL: https://bitbucket.org/myteam/my-app/pull-requests/42
 
 ## bitbucket pr comment
 
-プルリクエストのコメントを一覧表示する。デフォルトではインラインコードレビューコメントは除外される。
+プルリクエストのコメントを一覧表示する。インラインコードレビューコメントはデフォルトで含まれる。
 
 ```
 atl bitbucket pr comment [flags]
@@ -195,7 +195,7 @@ atl bitbucket pr comment [flags]
 | `--workspace` | - | No | サイト設定値 | ワークスペースのスラッグ（サイト設定で制限） |
 | `--repo` | - | Yes | - | リポジトリのスラッグ |
 | `--pr` | - | Yes | - | プルリクエスト ID |
-| `--inline` | - | No | `false` | インラインコードレビューコメントも含める |
+| `--inline` | - | No | `true` | インラインコードレビューコメントも含める |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 
@@ -208,14 +208,6 @@ LGTM! マージしてください。
 
 [2024-06-15T11:00:00.000000+00:00] Jane Smith:
 修正を確認しました。
-```
-
-**出力例** (`--inline`):
-```
-Found 2 comment(s):
-
-[2024-06-15T10:30:00.000000+00:00] John Doe:
-LGTM! マージしてください。
 
 Found 1 inline comment(s):
 
@@ -223,15 +215,29 @@ Found 1 inline comment(s):
 この変数名はもう少し分かりやすくした方が良いです。
 ```
 
+**出力例** (`--inline=false`):
+```
+Found 2 comment(s):
+
+[2024-06-15T10:30:00.000000+00:00] John Doe:
+LGTM! マージしてください。
+
+[2024-06-15T11:00:00.000000+00:00] Jane Smith:
+修正を確認しました。
+```
+
 **JSON 出力例** (`--json`):
 ```json
-[
-  {
-    "author": "John Doe",
-    "created": "2024-06-15T10:30:00.000000+00:00",
-    "body": "LGTM! マージしてください。"
-  }
-]
+{
+  "comments": [
+    {
+      "author": "John Doe",
+      "created": "2024-06-15T10:30:00.000000+00:00",
+      "body": "LGTM! マージしてください。"
+    }
+  ],
+  "inline_comments": []
+}
 ```
 
 **JSON 出力例** (`--json --inline`):
