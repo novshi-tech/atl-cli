@@ -24,6 +24,9 @@ atl bitbucket pr create --repo my-app --title "新機能追加" --source feature
 
 # PRのコメントを取得
 atl bitbucket pr comment --repo my-app --pr 42
+
+# PRのインラインコードレビューコメントも含めて取得
+atl bitbucket pr comment --repo my-app --pr 42 --inline
 ```
 
 ## ワークスペースの解決

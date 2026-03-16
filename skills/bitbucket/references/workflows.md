@@ -23,7 +23,11 @@ atl bitbucket pr create --repo my-app --title "ユーザー認証の実装" --so
 ## 3. PRのレビューコメントを確認する
 
 ```bash
+# 通常のコメントのみ
 atl bitbucket pr comment --repo my-app --pr 42
+
+# インラインコードレビューコメントも含める
+atl bitbucket pr comment --repo my-app --pr 42 --inline
 ```
 
 ## 4. Jira 課題と連携して PR を作成する
