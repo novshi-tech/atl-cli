@@ -84,6 +84,12 @@ func runInstallSkills(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+// internalSkills are skills bundled in the repo for contributor use only and
+// should not be installed to end-user client skill directories.
+var internalSkills = map[string]bool{
+	"release": true,
+}
+
 func listSkills() ([]string, error) {
 	entries, err := fs.ReadDir(skillsFS, "skills")
 	if err != nil {
@@ -91,7 +97,7 @@ func listSkills() ([]string, error) {
 	}
 	var names []string
 	for _, e := range entries {
-		if e.IsDir() {
+		if e.IsDir() && !internalSkills[e.Name()] {
 			names = append(names, e.Name())
 		}
 	}
