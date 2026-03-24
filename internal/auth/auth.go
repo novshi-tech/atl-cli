@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -22,10 +23,13 @@ type SiteCredentials struct {
 }
 
 // NewStore returns a CredentialStore, trying keyring first, then falling back to pass.
+// In sandbox environments (SANDBOX env var set), keyring probe is skipped.
 func NewStore() (CredentialStore, error) {
-	ks := &KeyringStore{}
-	if err := ks.Probe(); err == nil {
-		return ks, nil
+	if os.Getenv("SANDBOX") == "" {
+		ks := &KeyringStore{}
+		if err := ks.Probe(); err == nil {
+			return ks, nil
+		}
 	}
 	ps, err := NewPassStore()
 	if err != nil {
