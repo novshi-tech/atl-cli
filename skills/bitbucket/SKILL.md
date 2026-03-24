@@ -47,11 +47,9 @@ BB_TOKEN=$(atl auth get --field bb-api-token --json | jq -r '.value')
 curl -s -u "${EMAIL}:${BB_TOKEN}" \
   -X POST \
   -H "Content-Type: application/json" \
-  -d '{"content": {"raw": "🤖 レビューコメントです"}}' \
+  -d '{"content": {"raw": "レビューコメントです"}}' \
   "https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pullrequests/{pr_id}/comments"
 ```
-
-> **Note:** Claude（AIエージェント）からコメントを投稿する場合は、本文の先頭に `🤖 ` を付与すること。
 
 ## 共通フラグ
 

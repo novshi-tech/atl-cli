@@ -67,9 +67,6 @@ atl jira issue create --project PROJ --summary "新機能の実装" --type Story
 - `--type` / `-t` - 課題タイプ（デフォルト: Task）
 - `--description` / `-d` - 説明
 
-> **Note:** Claude（AIエージェント）から課題を作成する場合は、summary の先頭に `🤖 ` を付与すること。
-> 例: `atl jira issue create --project PROJ --summary "🤖 自動生成タスク" --type Task`
-
 ### 課題を更新する (`issue update`)
 
 既存の課題のサマリー、説明、ステータス、担当者を更新する。
@@ -98,9 +95,6 @@ atl jira issue update --key PROJ-123 --summary "新サマリー" --status "Done"
 ```bash
 atl jira issue comment --key PROJ-123 --body "PR をレビューしてください"
 ```
-
-> **Note:** Claude（AIエージェント）からコメントを投稿する場合は、本文の先頭に `🤖 ` を付与すること。
-> 例: `atl jira issue comment --key PROJ-123 --body "🤖 レビュー完了しました"`
 
 #### ユーザーへのメンション
 
