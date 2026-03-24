@@ -21,7 +21,7 @@ func init() {
 }
 
 func Execute() {
-	checkAndAutoUpdate()
+	checkForUpdate()
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}

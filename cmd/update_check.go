@@ -78,9 +78,9 @@ func fetchLatestVersion() (string, error) {
 	return info.Version, nil
 }
 
-// checkAndAutoUpdate checks once per day if a newer version is available and
+// checkForUpdate checks once per day if a newer version is available and
 // notifies the user if one is found.
-func checkAndAutoUpdate() {
+func checkForUpdate() {
 	today := time.Now().Format("2006-01-02")
 
 	if readLastCheckDate() == today {
