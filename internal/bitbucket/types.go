@@ -121,8 +121,8 @@ type PRResolution struct {
 
 type PRCommentContent struct {
 	Raw    string `json:"raw"`
-	Markup string `json:"markup"`
-	HTML   string `json:"html"`
+	Markup string `json:"markup,omitempty"`
+	HTML   string `json:"html,omitempty"`
 }
 
 type PRInline struct {
