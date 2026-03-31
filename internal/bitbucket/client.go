@@ -104,6 +104,16 @@ func (c *Client) ListPRComments(workspace, repoSlug string, prID int) (*PRCommen
 	return &resp, nil
 }
 
+// CreatePRComment creates a comment on a pull request.
+func (c *Client) CreatePRComment(workspace, repoSlug string, prID int, req CreatePRCommentRequest) (*PRComment, error) {
+	path := fmt.Sprintf("/repositories/%s/%s/pullrequests/%d/comments", workspace, repoSlug, prID)
+	var resp PRComment
+	if err := c.doRequest("POST", path, req, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 func (c *Client) doRequest(method, path string, body any, result any) error {
 	var bodyReader io.Reader
 	if body != nil {

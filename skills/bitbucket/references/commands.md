@@ -263,3 +263,36 @@ LGTM! マージしてください。
   ]
 }
 ```
+
+## bitbucket pr comment create
+
+プルリクエストにコメントを投稿する。`--path` と `--line` を指定するとインラインコメントになる。
+
+```
+atl bitbucket pr comment create [flags]
+```
+
+| フラグ | 短縮 | 必須 | デフォルト | 説明 |
+|--------|------|------|-----------|------|
+| `--workspace` | - | No | サイト設定値 | ワークスペースのスラッグ |
+| `--repo` | - | Yes | - | リポジトリのスラッグ |
+| `--pr` | - | Yes | - | プルリクエスト ID |
+| `--body` | `-b` | Yes | - | コメント本文 |
+| `--path` | - | No | - | インラインコメントのファイルパス |
+| `--line` | - | No | - | インラインコメントの行番号 |
+| `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
+
+**出力例:**
+```
+Comment added to pull request #42
+URL: https://bitbucket.org/myteam/my-app/pull-requests/42
+```
+
+**JSON 出力例** (`--json`):
+```json
+{
+  "key": "1",
+  "url": "https://bitbucket.org/myteam/my-app/pull-requests/42"
+}
+```

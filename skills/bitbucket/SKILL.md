@@ -1,6 +1,6 @@
 ---
 name: bitbucket
-description: Bitbucket Cloud の操作を行うスキル。リポジトリの一覧・詳細表示、プルリクエストの一覧・作成・コメント取得をサポート。「Bitbucketのリポジトリを一覧して」「PRを一覧して」「PRを作成して」「PRのコメントを確認して」など Bitbucket 関連の操作を依頼された場合に使用。
+description: Bitbucket Cloud の操作を行うスキル。リポジトリの一覧・詳細表示、プルリクエストの一覧・作成・コメント取得・コメント投稿をサポート。「Bitbucketのリポジトリを一覧して」「PRを一覧して」「PRを作成して」「PRのコメントを確認して」「PRにコメントして」など Bitbucket 関連の操作を依頼された場合に使用。
 ---
 
 # Bitbucket
@@ -30,29 +30,17 @@ atl bitbucket pr comment --repo my-app --pr 42 --inline=false
 
 # 解決済みコメントも含めて取得
 atl bitbucket pr comment --repo my-app --pr 42 --include-resolved
+
+# PRにコメントを投稿
+atl bitbucket pr comment create --repo my-app --pr 42 --body "LGTM!"
+
+# インラインコメントを投稿
+atl bitbucket pr comment create --repo my-app --pr 42 --body "この変数名を変更してください" --path src/auth.go --line 15
 ```
 
 ## ワークスペースの解決
 
 `--workspace` はサイト設定にワークスペースが保存されていれば省略可能。両方指定した場合は一致チェックが行われる。サイト設定にもフラグにもない場合はエラーになる。
-
-## PRにコメントを投稿する（API直接呼び出し）
-
-`atl bitbucket` にはPRコメント投稿コマンドがないため、Bitbucket REST API を直接呼び出す。
-
-```bash
-# 認証情報を取得
-BASE_URL=$(atl auth get --field base-url --json | jq -r '.value')
-EMAIL=$(atl auth get --field email --json | jq -r '.value')
-BB_TOKEN=$(atl auth get --field bb-api-token --json | jq -r '.value')
-
-# PRにコメントを投稿
-curl -s -u "${EMAIL}:${BB_TOKEN}" \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{"content": {"raw": "レビューコメントです"}}' \
-  "https://api.bitbucket.org/2.0/repositories/{workspace}/{repo_slug}/pullrequests/{pr_id}/comments"
-```
 
 ## 共通フラグ
 

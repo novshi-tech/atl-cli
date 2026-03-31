@@ -90,6 +90,17 @@ type CreatePRBranch struct {
 	Name string `json:"name"`
 }
 
+// CreatePRCommentRequest is the request body for creating a PR comment.
+type CreatePRCommentRequest struct {
+	Content PRCommentContent `json:"content"`
+	Inline  *PRInline        `json:"inline,omitempty"`
+}
+
+// PRCommentLinks contains links for a PR comment.
+type PRCommentLinks struct {
+	HTML Link `json:"html"`
+}
+
 // PRComment represents a comment on a pull request.
 type PRComment struct {
 	ID         int              `json:"id"`
@@ -99,6 +110,7 @@ type PRComment struct {
 	UpdatedOn  string           `json:"updated_on"`
 	Inline     *PRInline        `json:"inline"`
 	Resolution *PRResolution    `json:"resolution"`
+	Links      *PRCommentLinks  `json:"links,omitempty"`
 }
 
 // PRResolution represents the resolution status of a comment.
