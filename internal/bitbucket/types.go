@@ -92,12 +92,19 @@ type CreatePRBranch struct {
 
 // PRComment represents a comment on a pull request.
 type PRComment struct {
-	ID        int              `json:"id"`
-	Content   PRCommentContent `json:"content"`
-	User      PRUser           `json:"user"`
-	CreatedOn string           `json:"created_on"`
-	UpdatedOn string           `json:"updated_on"`
-	Inline    *PRInline        `json:"inline"`
+	ID         int              `json:"id"`
+	Content    PRCommentContent `json:"content"`
+	User       PRUser           `json:"user"`
+	CreatedOn  string           `json:"created_on"`
+	UpdatedOn  string           `json:"updated_on"`
+	Inline     *PRInline        `json:"inline"`
+	Resolution *PRResolution    `json:"resolution"`
+}
+
+// PRResolution represents the resolution status of a comment.
+type PRResolution struct {
+	User      PRUser `json:"user"`
+	CreatedOn string `json:"created_on"`
 }
 
 type PRCommentContent struct {

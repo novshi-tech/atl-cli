@@ -184,7 +184,7 @@ URL: https://bitbucket.org/myteam/my-app/pull-requests/42
 
 ## bitbucket pr comment
 
-プルリクエストのコメントを一覧表示する。インラインコードレビューコメントはデフォルトで含まれる。
+プルリクエストのコメントを一覧表示する。インラインコードレビューコメントはデフォルトで含まれる。解決済みコメントはデフォルトで除外される。
 
 ```
 atl bitbucket pr comment [flags]
@@ -196,6 +196,7 @@ atl bitbucket pr comment [flags]
 | `--repo` | - | Yes | - | リポジトリのスラッグ |
 | `--pr` | - | Yes | - | プルリクエスト ID |
 | `--inline` | - | No | `true` | インラインコードレビューコメントも含める |
+| `--include-resolved` | - | No | `false` | 解決済みコメントも含める（デフォルトでは除外） |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 

@@ -19,6 +19,7 @@ func init() {
 	bbPRCommentCmd.Flags().Int("pr", 0, "Pull request ID (required)")
 	bbPRCommentCmd.MarkFlagRequired("pr")
 	bbPRCommentCmd.Flags().Bool("inline", true, "Include inline code review comments")
+	bbPRCommentCmd.Flags().Bool("include-resolved", false, "Include resolved comments (excluded by default)")
 	bbPRCmd.AddCommand(bbPRCommentCmd)
 }
 
@@ -35,6 +36,7 @@ func runBBPRComment(cmd *cobra.Command, args []string) error {
 	repo, _ := cmd.Flags().GetString("repo")
 	prID, _ := cmd.Flags().GetInt("pr")
 	showInline, _ := cmd.Flags().GetBool("inline")
+	includeResolved, _ := cmd.Flags().GetBool("include-resolved")
 
 	resp, err := client.ListPRComments(workspace, repo, prID)
 	if err != nil {
@@ -44,6 +46,9 @@ func runBBPRComment(cmd *cobra.Command, args []string) error {
 	var comments []JSONCommentItem
 	var inlineComments []JSONInlineCommentItem
 	for _, c := range resp.Values {
+		if !includeResolved && c.Resolution != nil {
+			continue
+		}
 		if c.Inline != nil {
 			if showInline {
 				inlineComments = append(inlineComments, JSONInlineCommentItem{
