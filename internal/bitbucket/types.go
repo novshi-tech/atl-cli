@@ -90,10 +90,16 @@ type CreatePRBranch struct {
 	Name string `json:"name"`
 }
 
+// PRCommentParent is the parent comment reference for replies.
+type PRCommentParent struct {
+	ID int `json:"id"`
+}
+
 // CreatePRCommentRequest is the request body for creating a PR comment.
 type CreatePRCommentRequest struct {
 	Content PRCommentContent `json:"content"`
 	Inline  *PRInline        `json:"inline,omitempty"`
+	Parent  *PRCommentParent `json:"parent,omitempty"`
 }
 
 // PRCommentLinks contains links for a PR comment.

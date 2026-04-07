@@ -280,6 +280,7 @@ atl bitbucket pr comment create [flags]
 | `--body` | `-b` | Yes | - | コメント本文 |
 | `--path` | - | No | - | インラインコメントのファイルパス |
 | `--line` | - | No | - | インラインコメントの行番号 |
+| `--parent` | - | No | - | 返信先のコメント ID（コメントへの返信に使用） |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 

@@ -23,6 +23,7 @@ func init() {
 	bbPRCommentCreateCmd.MarkFlagRequired("body")
 	bbPRCommentCreateCmd.Flags().String("path", "", "File path for inline comment")
 	bbPRCommentCreateCmd.Flags().Int("line", 0, "Line number for inline comment")
+	bbPRCommentCreateCmd.Flags().Int("parent", 0, "Parent comment ID (for replies)")
 	bbPRCommentCmd.AddCommand(bbPRCommentCreateCmd)
 }
 
@@ -41,6 +42,7 @@ func runBBPRCommentCreate(cmd *cobra.Command, args []string) error {
 	body, _ := cmd.Flags().GetString("body")
 	path, _ := cmd.Flags().GetString("path")
 	line, _ := cmd.Flags().GetInt("line")
+	parentID, _ := cmd.Flags().GetInt("parent")
 
 	req := bitbucket.CreatePRCommentRequest{
 		Content: bitbucket.PRCommentContent{Raw: body},
@@ -52,6 +54,10 @@ func runBBPRCommentCreate(cmd *cobra.Command, args []string) error {
 			inline.To = &line
 		}
 		req.Inline = inline
+	}
+
+	if parentID > 0 {
+		req.Parent = &bitbucket.PRCommentParent{ID: parentID}
 	}
 
 	comment, err := client.CreatePRComment(workspace, repo, prID, req)
