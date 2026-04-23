@@ -116,6 +116,7 @@ type PRComment struct {
 	UpdatedOn  string           `json:"updated_on"`
 	Inline     *PRInline        `json:"inline"`
 	Resolution *PRResolution    `json:"resolution"`
+	Parent     *PRCommentParent `json:"parent,omitempty"`
 	Links      *PRCommentLinks  `json:"links,omitempty"`
 }
 

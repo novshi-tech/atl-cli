@@ -204,26 +204,28 @@ atl bitbucket pr comment [flags]
 ```
 Found 2 comment(s):
 
-[2024-06-15T10:30:00.000000+00:00] John Doe:
+[#101][2024-06-15T10:30:00.000000+00:00] John Doe:
 LGTM! マージしてください。
 
-[2024-06-15T11:00:00.000000+00:00] Jane Smith:
+[#102 reply to #101][2024-06-15T11:00:00.000000+00:00] Jane Smith:
 修正を確認しました。
 
 Found 1 inline comment(s):
 
-[2024-06-15T09:00:00.000000+00:00] Alice on src/auth.go (lines 42-45):
+[#201][2024-06-15T09:00:00.000000+00:00] Alice on src/auth.go (lines 42-45):
 この変数名はもう少し分かりやすくした方が良いです。
 ```
+
+コメントヘッダの `#<id>` はコメント ID、`reply to #<id>` は返信先コメント ID。`bitbucket pr comment create --parent` でこの ID を使う。
 
 **出力例** (`--inline=false`):
 ```
 Found 2 comment(s):
 
-[2024-06-15T10:30:00.000000+00:00] John Doe:
+[#101][2024-06-15T10:30:00.000000+00:00] John Doe:
 LGTM! マージしてください。
 
-[2024-06-15T11:00:00.000000+00:00] Jane Smith:
+[#102 reply to #101][2024-06-15T11:00:00.000000+00:00] Jane Smith:
 修正を確認しました。
 ```
 
@@ -232,9 +234,17 @@ LGTM! マージしてください。
 {
   "comments": [
     {
+      "id": 101,
       "author": "John Doe",
       "created": "2024-06-15T10:30:00.000000+00:00",
       "body": "LGTM! マージしてください。"
+    },
+    {
+      "id": 102,
+      "parent_id": 101,
+      "author": "Jane Smith",
+      "created": "2024-06-15T11:00:00.000000+00:00",
+      "body": "修正を確認しました。"
     }
   ],
   "inline_comments": []
@@ -246,6 +256,7 @@ LGTM! マージしてください。
 {
   "comments": [
     {
+      "id": 101,
       "author": "John Doe",
       "created": "2024-06-15T10:30:00.000000+00:00",
       "body": "LGTM! マージしてください。"
@@ -253,12 +264,23 @@ LGTM! マージしてください。
   ],
   "inline_comments": [
     {
+      "id": 201,
       "author": "Alice",
       "created": "2024-06-15T09:00:00.000000+00:00",
       "path": "src/auth.go",
       "from": 42,
       "to": 45,
       "body": "この変数名はもう少し分かりやすくした方が良いです。"
+    },
+    {
+      "id": 202,
+      "parent_id": 201,
+      "author": "Bob",
+      "created": "2024-06-15T09:30:00.000000+00:00",
+      "path": "src/auth.go",
+      "from": 42,
+      "to": 45,
+      "body": "指摘の通り修正します。"
     }
   ]
 }
@@ -296,4 +318,22 @@ URL: https://bitbucket.org/myteam/my-app/pull-requests/42
   "key": "1",
   "url": "https://bitbucket.org/myteam/my-app/pull-requests/42"
 }
+```
+
+**インラインコメントへの返信**:
+
+返信先のコメント ID は `bitbucket pr comment` の出力（`#<id>` あるいは JSON の `id`）から取得する。インライン返信では返信先と同じ `--path` / `--line` を指定する。
+
+```bash
+# 1) まずコメント一覧から返信先インラインコメントの id を取得
+atl bitbucket pr comment --repo my-app --pr 42 --json
+
+# 2) 同じ path / line と --parent でインライン返信
+atl bitbucket pr comment create --repo my-app --pr 42 \
+    --path src/auth.go --line 45 --parent 201 \
+    --body "指摘の通り修正しました"
+
+# 通常コメント（非インライン）への返信は --path / --line を省略
+atl bitbucket pr comment create --repo my-app --pr 42 \
+    --parent 101 --body "確認しました"
 ```

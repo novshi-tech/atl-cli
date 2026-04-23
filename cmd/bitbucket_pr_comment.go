@@ -49,23 +49,31 @@ func runBBPRComment(cmd *cobra.Command, args []string) error {
 		if !includeResolved && c.Resolution != nil {
 			continue
 		}
+		parentID := 0
+		if c.Parent != nil {
+			parentID = c.Parent.ID
+		}
 		if c.Inline != nil {
 			if showInline {
 				inlineComments = append(inlineComments, JSONInlineCommentItem{
-					Author:  c.User.DisplayName,
-					Created: c.CreatedOn,
-					Path:    c.Inline.Path,
-					From:    c.Inline.From,
-					To:      c.Inline.To,
-					Body:    c.Content.Raw,
+					ID:       c.ID,
+					ParentID: parentID,
+					Author:   c.User.DisplayName,
+					Created:  c.CreatedOn,
+					Path:     c.Inline.Path,
+					From:     c.Inline.From,
+					To:       c.Inline.To,
+					Body:     c.Content.Raw,
 				})
 			}
 			continue
 		}
 		comments = append(comments, JSONCommentItem{
-			Author:  c.User.DisplayName,
-			Created: c.CreatedOn,
-			Body:    c.Content.Raw,
+			ID:       c.ID,
+			ParentID: parentID,
+			Author:   c.User.DisplayName,
+			Created:  c.CreatedOn,
+			Body:     c.Content.Raw,
 		})
 	}
 
@@ -87,7 +95,7 @@ func runBBPRComment(cmd *cobra.Command, args []string) error {
 	if len(comments) > 0 {
 		fmt.Printf("Found %d comment(s):\n\n", len(comments))
 		for _, c := range comments {
-			fmt.Printf("[%s] %s:\n%s\n\n", c.Created, c.Author, c.Body)
+			fmt.Printf("[#%d%s][%s] %s:\n%s\n\n", c.ID, replyRef(c.ParentID), c.Created, c.Author, c.Body)
 		}
 	}
 
@@ -95,11 +103,18 @@ func runBBPRComment(cmd *cobra.Command, args []string) error {
 		fmt.Printf("Found %d inline comment(s):\n\n", len(inlineComments))
 		for _, c := range inlineComments {
 			lineRef := prInlineLineRef(c.From, c.To)
-			fmt.Printf("[%s] %s on %s%s:\n%s\n\n", c.Created, c.Author, c.Path, lineRef, c.Body)
+			fmt.Printf("[#%d%s][%s] %s on %s%s:\n%s\n\n", c.ID, replyRef(c.ParentID), c.Created, c.Author, c.Path, lineRef, c.Body)
 		}
 	}
 
 	return nil
+}
+
+func replyRef(parentID int) string {
+	if parentID > 0 {
+		return fmt.Sprintf(" reply to #%d", parentID)
+	}
+	return ""
 }
 
 func prInlineLineRef(from, to *int) string {

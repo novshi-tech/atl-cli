@@ -36,6 +36,12 @@ atl bitbucket pr comment create --repo my-app --pr 42 --body "LGTM!"
 
 # インラインコメントを投稿
 atl bitbucket pr comment create --repo my-app --pr 42 --body "この変数名を変更してください" --path src/auth.go --line 15
+
+# インラインコメントに返信（--parent は一覧出力の id、path と line は返信先と同じ値）
+atl bitbucket pr comment create --repo my-app --pr 42 --body "修正しました" --path src/auth.go --line 15 --parent 201
+
+# 通常コメントに返信（--parent のみ、path / line は指定しない）
+atl bitbucket pr comment create --repo my-app --pr 42 --body "確認しました" --parent 101
 ```
 
 ## ワークスペースの解決
