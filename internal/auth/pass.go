@@ -23,28 +23,31 @@ func NewPassStore() (*PassStore, error) {
 }
 
 func (p *PassStore) Set(key, value string) error {
-	cmd := exec.Command(p.passPath, "insert", "--force", "--echo", passPrefix+key)
+	fullKey := passPrefix + key
+	cmd := exec.Command(p.passPath, "insert", "--force", "--echo", fullKey)
 	cmd.Stdin = strings.NewReader(value)
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pass insert %s: %w", key, err)
+		return fmt.Errorf("pass insert %s: %w", fullKey, err)
 	}
 	return nil
 }
 
 func (p *PassStore) Get(key string) (string, error) {
-	cmd := exec.Command(p.passPath, "show", passPrefix+key)
+	fullKey := passPrefix + key
+	cmd := exec.Command(p.passPath, "show", fullKey)
 	out, err := cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("pass show %s: %w", key, err)
+		return "", fmt.Errorf("pass show %s: %w", fullKey, err)
 	}
 	return strings.TrimSpace(string(out)), nil
 }
 
 func (p *PassStore) Delete(key string) error {
-	cmd := exec.Command(p.passPath, "rm", "-f", passPrefix+key)
+	fullKey := passPrefix + key
+	cmd := exec.Command(p.passPath, "rm", "-f", fullKey)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("pass rm %s: %w: %s", key, err, string(out))
+		return fmt.Errorf("pass rm %s: %w: %s", fullKey, err, string(out))
 	}
 	return nil
 }
