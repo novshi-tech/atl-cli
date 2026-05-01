@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"bytes"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -24,20 +25,24 @@ func NewPassStore() (*PassStore, error) {
 
 func (p *PassStore) Set(key, value string) error {
 	fullKey := passPrefix + key
+	var stderr bytes.Buffer
 	cmd := exec.Command(p.passPath, "insert", "--force", "--echo", fullKey)
 	cmd.Stdin = strings.NewReader(value)
+	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("pass insert %s: %w", fullKey, err)
+		return fmt.Errorf("pass insert %s: %w: %s", fullKey, err, strings.TrimSpace(stderr.String()))
 	}
 	return nil
 }
 
 func (p *PassStore) Get(key string) (string, error) {
 	fullKey := passPrefix + key
+	var stderr bytes.Buffer
 	cmd := exec.Command(p.passPath, "show", fullKey)
+	cmd.Stderr = &stderr
 	out, err := cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("pass show %s: %w", fullKey, err)
+		return "", fmt.Errorf("pass show %s: %w: %s", fullKey, err, strings.TrimSpace(stderr.String()))
 	}
 	return strings.TrimSpace(string(out)), nil
 }
