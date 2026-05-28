@@ -60,6 +60,21 @@ func runIssueView(cmd *cobra.Command, args []string) error {
 				})
 			}
 		}
+		for _, a := range issue.Fields.Attachment {
+			author := ""
+			if a.Author != nil {
+				author = a.Author.DisplayName
+			}
+			detail.Attachments = append(detail.Attachments, JSONAttachmentItem{
+				ID:       a.ID,
+				Filename: a.Filename,
+				Size:     a.Size,
+				MimeType: a.MimeType,
+				Author:   author,
+				Created:  a.Created,
+				Content:  a.Content,
+			})
+		}
 		return printJSON(detail)
 	}
 
@@ -75,6 +90,17 @@ func runIssueView(cmd *cobra.Command, args []string) error {
 
 	if issue.Fields.Description != nil {
 		fmt.Printf("\n--- Description ---\n%s\n", adfToText(issue.Fields.Description))
+	}
+
+	if len(issue.Fields.Attachment) > 0 {
+		fmt.Printf("\n--- Attachments (%d) ---\n", len(issue.Fields.Attachment))
+		for _, a := range issue.Fields.Attachment {
+			author := "Unknown"
+			if a.Author != nil {
+				author = a.Author.DisplayName
+			}
+			fmt.Printf("%-12s  %-10s  %-20s  %s\n", a.ID, formatSize(a.Size), author, a.Filename)
+		}
 	}
 
 	if issue.Fields.Comment != nil && len(issue.Fields.Comment.Comments) > 0 {

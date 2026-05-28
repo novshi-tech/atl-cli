@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"net/url"
 	"strings"
@@ -134,12 +135,57 @@ func (c *Client) SearchIssues(jql string, maxResults int) (*SearchResponse, erro
 
 // GetIssue retrieves a single issue with full details.
 func (c *Client) GetIssue(key string) (*Issue, error) {
-	path := fmt.Sprintf("/rest/api/3/issue/%s?fields=summary,status,issuetype,assignee,description,comment,duedate", key)
+	path := fmt.Sprintf("/rest/api/3/issue/%s?fields=summary,status,issuetype,assignee,description,comment,duedate,attachment", key)
 	var resp Issue
 	if err := c.doRequest("GET", path, nil, &resp); err != nil {
 		return nil, err
 	}
 	return &resp, nil
+}
+
+// GetAttachments returns the attachments for an issue.
+func (c *Client) GetAttachments(key string) ([]Attachment, error) {
+	path := fmt.Sprintf("/rest/api/3/issue/%s?fields=attachment", key)
+	var resp Issue
+	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+		return nil, err
+	}
+	return resp.Fields.Attachment, nil
+}
+
+// DownloadAttachment downloads the content of an attachment by ID and writes it to w.
+// Returns the filename reported by the server (from Content-Disposition) if available.
+func (c *Client) DownloadAttachment(id string, w io.Writer) (string, error) {
+	url := c.baseURL + "/rest/api/3/attachment/content/" + id
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", fmt.Errorf("creating request: %w", err)
+	}
+	req.SetBasicAuth(c.email, c.apiToken)
+	req.Header.Set("Accept", "*/*")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("executing request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("jira API error (%d): %s", resp.StatusCode, string(body))
+	}
+
+	if _, err := io.Copy(w, resp.Body); err != nil {
+		return "", fmt.Errorf("writing attachment: %w", err)
+	}
+
+	filename := ""
+	if cd := resp.Header.Get("Content-Disposition"); cd != "" {
+		if _, params, err := mime.ParseMediaType(cd); err == nil {
+			filename = params["filename"]
+		}
+	}
+	return filename, nil
 }
 
 // ListSprints lists sprints for a board.

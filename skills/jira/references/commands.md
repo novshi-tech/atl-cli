@@ -194,6 +194,77 @@ atl jira issue comment --key PROJ-123 --body "@[山田太郎:5b10ac8d14c052e1e6c
 
 accountId は `atl jira user search --query "名前" --json` で取得できる。
 
+## jira issue attachment list
+
+課題に添付されたファイルの一覧を表示する。
+
+```
+atl jira issue attachment list [flags]
+```
+
+| フラグ | 短縮 | 必須 | デフォルト | 説明 |
+|--------|------|------|-----------|------|
+| `--key` | `-k` | Yes | - | 課題キー |
+| `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
+
+**出力例:**
+```
+Found 2 attachment(s) on PROJ-123:
+
+10001         12.3KB      John Doe              screenshot.png
+10002         4.2MB       Jane Smith            spec.pdf
+```
+
+**JSON 出力例** (`--json`):
+```json
+[
+  {
+    "id": "10001",
+    "filename": "screenshot.png",
+    "size": 12582,
+    "mimeType": "image/png",
+    "author": "John Doe",
+    "created": "2024-01-15T10:30:00.000+0000",
+    "content": "https://example.atlassian.net/rest/api/3/attachment/content/10001"
+  }
+]
+```
+
+## jira issue attachment download
+
+課題の添付ファイルをダウンロードする。`--id` で直接指定するか、`--key` + `--filename` でファイル名から取得する。
+
+```
+atl jira issue attachment download [flags]
+```
+
+| フラグ | 短縮 | 必須 | デフォルト | 説明 |
+|--------|------|------|-----------|------|
+| `--id` | - | No* | - | 添付ファイル ID |
+| `--key` | `-k` | No* | - | 課題キー（`--filename` と併用） |
+| `--filename` | - | No* | - | ファイル名（`--key` と併用） |
+| `--output` | `-o` | No | サーバ提供のファイル名 | 出力先パス（ディレクトリ可、`-` で標準出力） |
+| `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
+
+\* `--id` または (`--key` + `--filename`) のいずれかが必須。
+
+**出力例:**
+```
+Downloaded attachment 10001 (12.3KB) to screenshot.png
+```
+
+**JSON 出力例** (`--json`):
+```json
+{
+  "id": "10001",
+  "filename": "screenshot.png",
+  "path": "screenshot.png",
+  "size": 12582
+}
+```
+
 ## jira sprint list
 
 ボードのスプリント一覧を表示する。

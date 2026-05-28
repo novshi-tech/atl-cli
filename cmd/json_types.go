@@ -9,15 +9,33 @@ type JSONIssueItem struct {
 }
 
 type JSONIssueDetail struct {
-	Key         string            `json:"key"`
-	Summary     string            `json:"summary"`
-	Status      string            `json:"status"`
-	Type        string            `json:"type"`
-	Assignee    string            `json:"assignee"`
-	URL         string            `json:"url"`
-	Description string            `json:"description"`
-	DueDate     string            `json:"duedate,omitempty"`
-	Comments    []JSONCommentItem `json:"comments,omitempty"`
+	Key         string               `json:"key"`
+	Summary     string               `json:"summary"`
+	Status      string               `json:"status"`
+	Type        string               `json:"type"`
+	Assignee    string               `json:"assignee"`
+	URL         string               `json:"url"`
+	Description string               `json:"description"`
+	DueDate     string               `json:"duedate,omitempty"`
+	Comments    []JSONCommentItem    `json:"comments,omitempty"`
+	Attachments []JSONAttachmentItem `json:"attachments,omitempty"`
+}
+
+type JSONAttachmentItem struct {
+	ID       string `json:"id"`
+	Filename string `json:"filename"`
+	Size     int64  `json:"size"`
+	MimeType string `json:"mimeType"`
+	Author   string `json:"author,omitempty"`
+	Created  string `json:"created"`
+	Content  string `json:"content"`
+}
+
+type JSONAttachmentDownload struct {
+	ID       string `json:"id"`
+	Filename string `json:"filename"`
+	Path     string `json:"path"`
+	Size     int64  `json:"size"`
 }
 
 type JSONCommentItem struct {

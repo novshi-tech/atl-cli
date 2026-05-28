@@ -95,6 +95,19 @@ type IssueFields struct {
 	Description *adf.Node      `json:"description"`
 	Comment     *CommentResult `json:"comment"`
 	DueDate     string         `json:"duedate,omitempty"`
+	Attachment  []Attachment   `json:"attachment,omitempty"`
+}
+
+// Attachment represents a file attached to a Jira issue.
+type Attachment struct {
+	ID       string `json:"id"`
+	Self     string `json:"self"`
+	Filename string `json:"filename"`
+	Author   *User  `json:"author,omitempty"`
+	Created  string `json:"created"`
+	Size     int64  `json:"size"`
+	MimeType string `json:"mimeType"`
+	Content  string `json:"content"`
 }
 
 type Status struct {
