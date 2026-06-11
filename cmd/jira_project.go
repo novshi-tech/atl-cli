@@ -42,7 +42,7 @@ func runProjectList(cmd *cobra.Command, args []string) error {
 	if jsonMode(cmd) {
 		items := make([]JSONProjectItem, len(resp.Values))
 		for i, p := range resp.Values {
-			items[i] = JSONProjectItem{Key: p.Key, Name: p.Name, Type: p.ProjectTypeKey}
+			items[i] = JSONProjectItem{ID: p.ID, Key: p.Key, Name: p.Name, Type: p.ProjectTypeKey}
 		}
 		return printJSON(items)
 	}
@@ -54,7 +54,7 @@ func runProjectList(cmd *cobra.Command, args []string) error {
 
 	fmt.Printf("Found %d project(s):\n\n", len(resp.Values))
 	for _, p := range resp.Values {
-		fmt.Printf("%-12s  %-40s  %s\n", p.Key, p.Name, p.ProjectTypeKey)
+		fmt.Printf("%-8s  %-12s  %-40s  %s\n", p.ID, p.Key, p.Name, p.ProjectTypeKey)
 	}
 	return nil
 }
