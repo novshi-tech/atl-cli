@@ -184,3 +184,17 @@ type Project struct {
 	Name           string `json:"name"`
 	ProjectTypeKey string `json:"projectTypeKey"`
 }
+
+// IssueTypeDetail represents a Jira issue type.
+type IssueTypeDetail struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Subtask     bool   `json:"subtask"`
+}
+
+// IssueTypeProjectResponse is the response from the project-scoped issue types endpoint.
+type IssueTypeProjectResponse struct {
+	IssueTypes []IssueTypeDetail `json:"issueTypes"`
+	ProjectID  string            `json:"projectId"`
+}

@@ -224,6 +224,27 @@ func (c *Client) ListProjects(query string, maxResults int) (*ProjectSearchRespo
 	return &resp, nil
 }
 
+// GetIssueTypes returns issue types. If projectKey is non-empty, returns only
+// types available for that project; otherwise returns all issue types.
+func (c *Client) GetIssueTypes(projectKey string) ([]IssueTypeDetail, error) {
+	if projectKey != "" {
+		path := "/rest/api/3/issuetype/project?projectKeys=" + urlEncode(projectKey)
+		var resp []IssueTypeProjectResponse
+		if err := c.doRequest("GET", path, nil, &resp); err != nil {
+			return nil, err
+		}
+		if len(resp) == 0 {
+			return nil, nil
+		}
+		return resp[0].IssueTypes, nil
+	}
+	var resp []IssueTypeDetail
+	if err := c.doRequest("GET", "/rest/api/3/issuetype", nil, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
 // GetMyself returns the currently authenticated user.
 func (c *Client) GetMyself() (*User, error) {
 	var resp User

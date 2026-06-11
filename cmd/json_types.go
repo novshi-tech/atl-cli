@@ -102,6 +102,13 @@ type JSONProjectItem struct {
 	Type string `json:"type"`
 }
 
+type JSONIssueTypeItem struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	Subtask     bool   `json:"subtask"`
+}
+
 type JSONPRItem struct {
 	ID     int    `json:"id"`
 	Title  string `json:"title"`
