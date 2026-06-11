@@ -13,7 +13,7 @@ var issueTypeListCmd = &cobra.Command{
 }
 
 func init() {
-	issueTypeListCmd.Flags().StringP("project", "p", "", "Filter by project key")
+	issueTypeListCmd.Flags().StringP("project", "p", "", "Filter by project ID")
 	issueTypeCmd.AddCommand(issueTypeListCmd)
 }
 

@@ -224,19 +224,16 @@ func (c *Client) ListProjects(query string, maxResults int) (*ProjectSearchRespo
 	return &resp, nil
 }
 
-// GetIssueTypes returns issue types. If projectKey is non-empty, returns only
+// GetIssueTypes returns issue types. If projectID is non-empty, returns only
 // types available for that project; otherwise returns all issue types.
-func (c *Client) GetIssueTypes(projectKey string) ([]IssueTypeDetail, error) {
-	if projectKey != "" {
-		path := "/rest/api/3/issuetype/project?projectKeys=" + urlEncode(projectKey)
-		var resp []IssueTypeProjectResponse
+func (c *Client) GetIssueTypes(projectID string) ([]IssueTypeDetail, error) {
+	if projectID != "" {
+		path := "/rest/api/3/issuetype/project?projectId=" + urlEncode(projectID)
+		var resp []IssueTypeDetail
 		if err := c.doRequest("GET", path, nil, &resp); err != nil {
 			return nil, err
 		}
-		if len(resp) == 0 {
-			return nil, nil
-		}
-		return resp[0].IssueTypes, nil
+		return resp, nil
 	}
 	var resp []IssueTypeDetail
 	if err := c.doRequest("GET", "/rest/api/3/issuetype", nil, &resp); err != nil {
