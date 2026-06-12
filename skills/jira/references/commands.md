@@ -45,6 +45,8 @@ atl jira issue create [flags]
 | `--summary` | `-s` | Yes | - | 課題サマリー |
 | `--type` | `-t` | No | `Task` | 課題タイプ（Task, Bug, Story, Epic 等） |
 | `--description` | `-d` | No | - | 課題の説明 |
+| `--due` | - | No | - | 期日（YYYY-MM-DD） |
+| `--epic` | - | No | - | 紐づけるエピックのキー（例: `PROJ-10`） |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 
@@ -120,6 +122,7 @@ Summary:   ログイン画面のバグ修正
 Status:    In Progress
 Type:      Bug
 Assignee:  John Doe
+Epic:      PROJ-10
 URL:       https://example.atlassian.net/browse/PROJ-123
 
 --- Description ---
@@ -141,6 +144,7 @@ URL:       https://example.atlassian.net/browse/PROJ-123
   "assignee": "John Doe",
   "url": "https://example.atlassian.net/browse/PROJ-123",
   "description": "ログイン画面でエラーが発生する問題を修正する。",
+  "epic": "PROJ-10",
   "comments": [
     {
       "author": "Jane Smith",
@@ -153,7 +157,7 @@ URL:       https://example.atlassian.net/browse/PROJ-123
 
 ## jira issue update
 
-既存の課題を更新する。`--summary`、`--description`、`--status`、`--assignee` のいずれかを指定する。
+既存の課題を更新する。`--summary`、`--description`、`--status`、`--assignee`、`--epic` のいずれかを指定する。
 
 ```
 atl jira issue update [flags]
@@ -166,6 +170,8 @@ atl jira issue update [flags]
 | `--description` | `-d` | No | - | 新しい説明 |
 | `--status` | - | No | - | 遷移先ステータス |
 | `--assignee` | - | No | - | 担当者の accountId（`none` で担当者解除） |
+| `--due` | - | No | - | 期日（YYYY-MM-DD） |
+| `--epic` | - | No | - | 紐づけるエピックのキー（例: `PROJ-10`） |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 

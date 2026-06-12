@@ -46,8 +46,8 @@ func (c *Client) BaseURL() string {
 	return c.baseURL
 }
 
-// CreateIssue creates a new issue.
-func (c *Client) CreateIssue(project, issueType, summary, description, dueDate string) (*CreateIssueResponse, error) {
+// CreateIssue creates a new issue. Pass epicKey to link the issue to an epic.
+func (c *Client) CreateIssue(project, issueType, summary, description, dueDate, epicKey string) (*CreateIssueResponse, error) {
 	req := CreateIssueRequest{
 		Fields: CreateIssueFields{
 			Project:   ProjectKey{Key: project},
@@ -62,6 +62,9 @@ func (c *Client) CreateIssue(project, issueType, summary, description, dueDate s
 	if dueDate != "" {
 		req.Fields.DueDate = dueDate
 	}
+	if epicKey != "" {
+		req.Fields.Parent = &ParentRef{Key: epicKey}
+	}
 
 	var resp CreateIssueResponse
 	if err := c.doRequest("POST", "/rest/api/3/issue", req, &resp); err != nil {
@@ -70,8 +73,8 @@ func (c *Client) CreateIssue(project, issueType, summary, description, dueDate s
 	return &resp, nil
 }
 
-// UpdateIssue updates an existing issue's summary, description, and/or due date.
-func (c *Client) UpdateIssue(key, summary, description, dueDate string) error {
+// UpdateIssue updates an existing issue's summary, description, due date, and/or parent epic.
+func (c *Client) UpdateIssue(key, summary, description, dueDate, epicKey string) error {
 	fields := UpdateIssueFields{}
 	if summary != "" {
 		fields.Summary = summary
@@ -82,6 +85,9 @@ func (c *Client) UpdateIssue(key, summary, description, dueDate string) error {
 	}
 	if dueDate != "" {
 		fields.DueDate = dueDate
+	}
+	if epicKey != "" {
+		fields.Parent = &ParentRef{Key: epicKey}
 	}
 	req := UpdateIssueRequest{Fields: fields}
 	return c.doRequest("PUT", "/rest/api/3/issue/"+key, req, nil)
@@ -124,7 +130,7 @@ func (c *Client) AddComment(key, body string) error {
 
 // SearchIssues searches for issues using JQL.
 func (c *Client) SearchIssues(jql string, maxResults int) (*SearchResponse, error) {
-	path := fmt.Sprintf("/rest/api/3/search/jql?jql=%s&maxResults=%d&fields=summary,status,issuetype,assignee",
+	path := fmt.Sprintf("/rest/api/3/search/jql?jql=%s&maxResults=%d&fields=summary,status,issuetype,assignee,parent",
 		urlEncode(jql), maxResults)
 	var resp SearchResponse
 	if err := c.doRequest("GET", path, nil, &resp); err != nil {
@@ -135,7 +141,7 @@ func (c *Client) SearchIssues(jql string, maxResults int) (*SearchResponse, erro
 
 // GetIssue retrieves a single issue with full details.
 func (c *Client) GetIssue(key string) (*Issue, error) {
-	path := fmt.Sprintf("/rest/api/3/issue/%s?fields=summary,status,issuetype,assignee,description,comment,duedate,attachment", key)
+	path := fmt.Sprintf("/rest/api/3/issue/%s?fields=summary,status,issuetype,assignee,description,comment,duedate,attachment,parent", key)
 	var resp Issue
 	if err := c.doRequest("GET", path, nil, &resp); err != nil {
 		return nil, err

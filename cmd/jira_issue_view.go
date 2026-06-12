@@ -48,6 +48,9 @@ func runIssueView(cmd *cobra.Command, args []string) error {
 			URL:      fmt.Sprintf("%s/browse/%s", client.BaseURL(), issue.Key),
 			DueDate:  issue.Fields.DueDate,
 		}
+		if issue.Fields.Parent != nil {
+			detail.Epic = issue.Fields.Parent.Key
+		}
 		if issue.Fields.Description != nil {
 			detail.Description = adfToText(issue.Fields.Description)
 		}
@@ -83,6 +86,9 @@ func runIssueView(cmd *cobra.Command, args []string) error {
 	fmt.Printf("Status:    %s\n", issue.Fields.Status.Name)
 	fmt.Printf("Type:      %s\n", issue.Fields.IssueType.Name)
 	fmt.Printf("Assignee:  %s\n", assignee)
+	if issue.Fields.Parent != nil {
+		fmt.Printf("Epic:      %s\n", issue.Fields.Parent.Key)
+	}
 	if issue.Fields.DueDate != "" {
 		fmt.Printf("Due:       %s\n", issue.Fields.DueDate)
 	}

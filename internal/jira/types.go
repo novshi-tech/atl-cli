@@ -13,6 +13,11 @@ type CreateIssueFields struct {
 	IssueType   IssueType  `json:"issuetype"`
 	Description *adf.Node  `json:"description,omitempty"`
 	DueDate     string     `json:"duedate,omitempty"`
+	Parent      *ParentRef `json:"parent,omitempty"`
+}
+
+type ParentRef struct {
+	Key string `json:"key"`
 }
 
 type ProjectKey struct {
@@ -36,9 +41,10 @@ type UpdateIssueRequest struct {
 }
 
 type UpdateIssueFields struct {
-	Summary     string    `json:"summary,omitempty"`
-	Description *adf.Node `json:"description,omitempty"`
-	DueDate     string    `json:"duedate,omitempty"`
+	Summary     string     `json:"summary,omitempty"`
+	Description *adf.Node  `json:"description,omitempty"`
+	DueDate     string     `json:"duedate,omitempty"`
+	Parent      *ParentRef `json:"parent,omitempty"`
 }
 
 // AssignIssueRequest is the request body for assigning an issue.
@@ -96,6 +102,7 @@ type IssueFields struct {
 	Comment     *CommentResult `json:"comment"`
 	DueDate     string         `json:"duedate,omitempty"`
 	Attachment  []Attachment   `json:"attachment,omitempty"`
+	Parent      *ParentRef     `json:"parent,omitempty"`
 }
 
 // Attachment represents a file attached to a Jira issue.

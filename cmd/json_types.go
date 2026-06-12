@@ -17,6 +17,7 @@ type JSONIssueDetail struct {
 	URL         string               `json:"url"`
 	Description string               `json:"description"`
 	DueDate     string               `json:"duedate,omitempty"`
+	Epic        string               `json:"epic,omitempty"`
 	Comments    []JSONCommentItem    `json:"comments,omitempty"`
 	Attachments []JSONAttachmentItem `json:"attachments,omitempty"`
 }

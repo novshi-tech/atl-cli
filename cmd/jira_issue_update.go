@@ -20,6 +20,7 @@ func init() {
 	issueUpdateCmd.Flags().String("status", "", "Transition to this status")
 	issueUpdateCmd.Flags().String("assignee", "", "Assignee account ID (use \"none\" to unassign)")
 	issueUpdateCmd.Flags().String("due", "", "Due date (YYYY-MM-DD)")
+	issueUpdateCmd.Flags().String("epic", "", "Epic key to link this issue to")
 	issueCmd.AddCommand(issueUpdateCmd)
 }
 
@@ -36,8 +37,10 @@ func runIssueUpdate(cmd *cobra.Command, args []string) error {
 	assignee, _ := cmd.Flags().GetString("assignee")
 	assigneeChanged := cmd.Flags().Changed("assignee")
 	due, _ := cmd.Flags().GetString("due")
+	epic, _ := cmd.Flags().GetString("epic")
+	epicChanged := cmd.Flags().Changed("epic")
 
-	if summary == "" && description == "" && status == "" && !assigneeChanged && due == "" {
+	if summary == "" && description == "" && status == "" && !assigneeChanged && due == "" && !epicChanged {
 		if jsonMode(cmd) {
 			return printJSON(JSONMutationResult{Key: key, URL: fmt.Sprintf("%s/browse/%s", client.BaseURL(), key)})
 		}
@@ -46,8 +49,8 @@ func runIssueUpdate(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	if summary != "" || description != "" || due != "" {
-		if err := client.UpdateIssue(key, summary, description, due); err != nil {
+	if summary != "" || description != "" || due != "" || epicChanged {
+		if err := client.UpdateIssue(key, summary, description, due, epic); err != nil {
 			return err
 		}
 		if !jsonMode(cmd) {
