@@ -9,11 +9,14 @@ import (
 var issueTypeListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List available issue types",
-	RunE:  runIssueTypeList,
+	Long: "List issue types. With --project, lists only the types that are " +
+		"actually creatable in the given project (project key or numeric ID). " +
+		"Without --project, lists all globally defined issue types.",
+	RunE: runIssueTypeList,
 }
 
 func init() {
-	issueTypeListCmd.Flags().StringP("project", "p", "", "Filter by project ID")
+	issueTypeListCmd.Flags().StringP("project", "p", "", "Project key or ID; lists only creatable issue types for that project")
 	issueTypeCmd.AddCommand(issueTypeListCmd)
 }
 

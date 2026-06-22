@@ -205,3 +205,13 @@ type IssueTypeProjectResponse struct {
 	IssueTypes []IssueTypeDetail `json:"issueTypes"`
 	ProjectID  string            `json:"projectId"`
 }
+
+// CreateMetaIssueTypesResponse is the response from
+// /rest/api/3/issue/createmeta/{projectIdOrKey}/issuetypes. Only the issue
+// types listed here are actually creatable in the project.
+type CreateMetaIssueTypesResponse struct {
+	IssueTypes []IssueTypeDetail `json:"issueTypes"`
+	StartAt    int               `json:"startAt"`
+	MaxResults int               `json:"maxResults"`
+	Total      int               `json:"total"`
+}

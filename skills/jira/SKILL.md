@@ -55,16 +55,20 @@ atl jira issue view --key PROJ-123
 
 ### 課題を作成する (`issue create`)
 
-新しい課題を作成する。
+新しい課題を作成する。`--type` はプロジェクトごとに名称が異なる（英語環境では `Task`/`Story`/`Bug`、日本語環境では `タスク`/`ストーリー`/`バグ` 等）ため、事前に `atl jira issuetype list --project <key>` で確認すること。
 
 ```bash
+# プロジェクトで作成可能な課題タイプを確認
+atl jira issuetype list --project PROJ
+
+# 課題を作成
 atl jira issue create --project PROJ --summary "新機能の実装" --type Story --description "機能の詳細説明"
 ```
 
 **フラグ:**
 - `--project` / `-p` - プロジェクトキー（必須）
 - `--summary` / `-s` - 課題のサマリー（必須）
-- `--type` / `-t` - 課題タイプ（デフォルト: Task）
+- `--type` / `-t` - 課題タイプ名（必須。プロジェクトにより異なる）
 - `--description` / `-d` - 説明
 
 ### 課題を更新する (`issue update`)

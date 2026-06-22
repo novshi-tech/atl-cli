@@ -230,16 +230,19 @@ func (c *Client) ListProjects(query string, maxResults int) (*ProjectSearchRespo
 	return &resp, nil
 }
 
-// GetIssueTypes returns issue types. If projectID is non-empty, returns only
-// types available for that project; otherwise returns all issue types.
-func (c *Client) GetIssueTypes(projectID string) ([]IssueTypeDetail, error) {
-	if projectID != "" {
-		path := "/rest/api/3/issuetype/project?projectId=" + urlEncode(projectID)
-		var resp []IssueTypeDetail
+// GetIssueTypes returns issue types. If projectIDOrKey is non-empty, returns
+// only types that the current user can actually create in that project (based
+// on the createmeta endpoint, which respects issue type scheme, screen scheme,
+// workflow, and permissions). Otherwise returns all globally defined issue
+// types.
+func (c *Client) GetIssueTypes(projectIDOrKey string) ([]IssueTypeDetail, error) {
+	if projectIDOrKey != "" {
+		path := "/rest/api/3/issue/createmeta/" + urlEncode(projectIDOrKey) + "/issuetypes"
+		var resp CreateMetaIssueTypesResponse
 		if err := c.doRequest("GET", path, nil, &resp); err != nil {
 			return nil, err
 		}
-		return resp, nil
+		return resp.IssueTypes, nil
 	}
 	var resp []IssueTypeDetail
 	if err := c.doRequest("GET", "/rest/api/3/issuetype", nil, &resp); err != nil {
