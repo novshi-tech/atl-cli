@@ -46,8 +46,9 @@ func (c *Client) BaseURL() string {
 	return c.baseURL
 }
 
-// CreateIssue creates a new issue. Pass epicKey to link the issue to an epic.
-func (c *Client) CreateIssue(project, issueType, summary, description, dueDate, epicKey string) (*CreateIssueResponse, error) {
+// CreateIssue creates a new issue. Pass parentKey to set the parent issue
+// (an epic for standard issues, or the parent task for sub-tasks).
+func (c *Client) CreateIssue(project, issueType, summary, description, dueDate, parentKey string) (*CreateIssueResponse, error) {
 	req := CreateIssueRequest{
 		Fields: CreateIssueFields{
 			Project:   ProjectKey{Key: project},
@@ -62,8 +63,8 @@ func (c *Client) CreateIssue(project, issueType, summary, description, dueDate, 
 	if dueDate != "" {
 		req.Fields.DueDate = dueDate
 	}
-	if epicKey != "" {
-		req.Fields.Parent = &ParentRef{Key: epicKey}
+	if parentKey != "" {
+		req.Fields.Parent = &ParentRef{Key: parentKey}
 	}
 
 	var resp CreateIssueResponse
@@ -73,8 +74,9 @@ func (c *Client) CreateIssue(project, issueType, summary, description, dueDate, 
 	return &resp, nil
 }
 
-// UpdateIssue updates an existing issue's summary, description, due date, and/or parent epic.
-func (c *Client) UpdateIssue(key, summary, description, dueDate, epicKey string) error {
+// UpdateIssue updates an existing issue's summary, description, due date, and/or parent.
+// parentKey may be an epic key (for standard issues) or a parent task key (for sub-tasks).
+func (c *Client) UpdateIssue(key, summary, description, dueDate, parentKey string) error {
 	fields := UpdateIssueFields{}
 	if summary != "" {
 		fields.Summary = summary
@@ -86,8 +88,8 @@ func (c *Client) UpdateIssue(key, summary, description, dueDate, epicKey string)
 	if dueDate != "" {
 		fields.DueDate = dueDate
 	}
-	if epicKey != "" {
-		fields.Parent = &ParentRef{Key: epicKey}
+	if parentKey != "" {
+		fields.Parent = &ParentRef{Key: parentKey}
 	}
 	req := UpdateIssueRequest{Fields: fields}
 	return c.doRequest("PUT", "/rest/api/3/issue/"+key, req, nil)

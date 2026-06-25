@@ -22,6 +22,8 @@ func init() {
 	issueCreateCmd.Flags().StringP("description", "d", "", "Issue description")
 	issueCreateCmd.Flags().String("due", "", "Due date (YYYY-MM-DD)")
 	issueCreateCmd.Flags().String("epic", "", "Epic key to link this issue to")
+	issueCreateCmd.Flags().String("parent", "", "Parent issue key (e.g. parent task for a sub-task)")
+	issueCreateCmd.MarkFlagsMutuallyExclusive("epic", "parent")
 	issueCmd.AddCommand(issueCreateCmd)
 }
 
@@ -37,8 +39,14 @@ func runIssueCreate(cmd *cobra.Command, args []string) error {
 	description, _ := cmd.Flags().GetString("description")
 	due, _ := cmd.Flags().GetString("due")
 	epic, _ := cmd.Flags().GetString("epic")
+	parent, _ := cmd.Flags().GetString("parent")
 
-	resp, err := client.CreateIssue(project, issueType, summary, description, due, epic)
+	parentKey := epic
+	if parent != "" {
+		parentKey = parent
+	}
+
+	resp, err := client.CreateIssue(project, issueType, summary, description, due, parentKey)
 	if err != nil {
 		return err
 	}

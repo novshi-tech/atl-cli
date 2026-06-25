@@ -47,6 +47,7 @@ atl jira issue create [flags]
 | `--description` | `-d` | No | - | 課題の説明 |
 | `--due` | - | No | - | 期日（YYYY-MM-DD） |
 | `--epic` | - | No | - | 紐づけるエピックのキー（例: `PROJ-10`） |
+| `--parent` | - | No | - | 親課題のキー（例: サブタスク作成時の親タスク `PROJ-123`）。`--epic` と同じ `parent` フィールドを設定するため併用不可 |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 
@@ -157,7 +158,7 @@ URL:       https://example.atlassian.net/browse/PROJ-123
 
 ## jira issue update
 
-既存の課題を更新する。`--summary`、`--description`、`--status`、`--assignee`、`--epic` のいずれかを指定する。
+既存の課題を更新する。`--summary`、`--description`、`--status`、`--assignee`、`--epic`、`--parent` のいずれかを指定する。
 
 ```
 atl jira issue update [flags]
@@ -172,6 +173,7 @@ atl jira issue update [flags]
 | `--assignee` | - | No | - | 担当者の accountId（`none` で担当者解除） |
 | `--due` | - | No | - | 期日（YYYY-MM-DD） |
 | `--epic` | - | No | - | 紐づけるエピックのキー（例: `PROJ-10`） |
+| `--parent` | - | No | - | 親課題のキー（例: サブタスクの親タスク `PROJ-123`）。`--epic` と同じ `parent` フィールドを設定するため併用不可 |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 

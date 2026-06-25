@@ -21,6 +21,8 @@ func init() {
 	issueUpdateCmd.Flags().String("assignee", "", "Assignee account ID (use \"none\" to unassign)")
 	issueUpdateCmd.Flags().String("due", "", "Due date (YYYY-MM-DD)")
 	issueUpdateCmd.Flags().String("epic", "", "Epic key to link this issue to")
+	issueUpdateCmd.Flags().String("parent", "", "Parent issue key (e.g. parent task for a sub-task)")
+	issueUpdateCmd.MarkFlagsMutuallyExclusive("epic", "parent")
 	issueCmd.AddCommand(issueUpdateCmd)
 }
 
@@ -38,19 +40,24 @@ func runIssueUpdate(cmd *cobra.Command, args []string) error {
 	assigneeChanged := cmd.Flags().Changed("assignee")
 	due, _ := cmd.Flags().GetString("due")
 	epic, _ := cmd.Flags().GetString("epic")
-	epicChanged := cmd.Flags().Changed("epic")
+	parent, _ := cmd.Flags().GetString("parent")
+	parentChanged := cmd.Flags().Changed("epic") || cmd.Flags().Changed("parent")
+	parentKey := epic
+	if cmd.Flags().Changed("parent") {
+		parentKey = parent
+	}
 
-	if summary == "" && description == "" && status == "" && !assigneeChanged && due == "" && !epicChanged {
+	if summary == "" && description == "" && status == "" && !assigneeChanged && due == "" && !parentChanged {
 		if jsonMode(cmd) {
 			return printJSON(JSONMutationResult{Key: key, URL: fmt.Sprintf("%s/browse/%s", client.BaseURL(), key)})
 		}
-		fmt.Println("Nothing to update. Specify --summary, --description, --status, --assignee, or --due.")
+		fmt.Println("Nothing to update. Specify --summary, --description, --status, --assignee, --due, --epic, or --parent.")
 		fmt.Printf("URL: %s/browse/%s\n", client.BaseURL(), key)
 		return nil
 	}
 
-	if summary != "" || description != "" || due != "" || epicChanged {
-		if err := client.UpdateIssue(key, summary, description, due, epic); err != nil {
+	if summary != "" || description != "" || due != "" || parentChanged {
+		if err := client.UpdateIssue(key, summary, description, due, parentKey); err != nil {
 			return err
 		}
 		if !jsonMode(cmd) {
