@@ -51,7 +51,7 @@ func runInstallSkills(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	destDir, err := resolveDestDir(pathFlag)
+	destDirs, err := resolveDestDir(pathFlag)
 	if err != nil {
 		return err
 	}
@@ -70,16 +70,21 @@ func runInstallSkills(cmd *cobra.Command, args []string) error {
 		targets = args
 	}
 
-	for _, skill := range targets {
-		if err := installSkill(skill, destDir, dryRun); err != nil {
-			return fmt.Errorf("installing skill %q: %w", skill, err)
+	for _, destDir := range destDirs {
+		for _, skill := range targets {
+			if err := installSkill(skill, destDir, dryRun); err != nil {
+				return fmt.Errorf("installing skill %q to %s: %w", skill, destDir, err)
+			}
 		}
 	}
 
 	if dryRun {
 		fmt.Println("\n(dry-run: no files were written)")
 	} else {
-		fmt.Printf("\nInstalled %d skill(s) to %s\n", len(targets), destDir)
+		fmt.Printf("\nInstalled %d skill(s)\n", len(targets))
+		for _, d := range destDirs {
+			fmt.Printf("  → %s\n", d)
+		}
 	}
 	return nil
 }
@@ -104,25 +109,29 @@ func listSkills() ([]string, error) {
 	return names, nil
 }
 
-func resolveDestDir(pathFlag string) (string, error) {
+func resolveDestDir(pathFlag string) ([]string, error) {
 	if pathFlag != "" {
-		return pathFlag, nil
+		return []string{pathFlag}, nil
 	}
-	return defaultSkillsPath()
+	return defaultSkillsPaths()
 }
 
-func defaultSkillsPath() (string, error) {
+func defaultSkillsPaths() ([]string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+	var dirs []string
 	for _, dir := range []string{".claude", ".codex", ".cursor"} {
 		p := filepath.Join(home, dir)
 		if info, err := os.Stat(p); err == nil && info.IsDir() {
-			return filepath.Join(p, "skills"), nil
+			dirs = append(dirs, filepath.Join(p, "skills"))
 		}
 	}
-	return filepath.Join(home, ".claude", "skills"), nil
+	if len(dirs) == 0 {
+		return []string{filepath.Join(home, ".claude", "skills")}, nil
+	}
+	return dirs, nil
 }
 
 func installSkill(skill, destDir string, dryRun bool) error {
