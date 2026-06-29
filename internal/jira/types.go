@@ -25,7 +25,8 @@ type ProjectKey struct {
 }
 
 type IssueType struct {
-	Name string `json:"name"`
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 // CreateIssueResponse is the response from creating an issue.

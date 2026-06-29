@@ -47,13 +47,21 @@ func (c *Client) BaseURL() string {
 }
 
 // CreateIssue creates a new issue. Pass parentKey to set the parent issue
-// (an epic for standard issues, or the parent task for sub-tasks).
+// (an epic for standard issues, or the parent task for sub-tasks). issueType
+// may be either an issue type name (e.g. "Task", "タスク") or a numeric id;
+// names are resolved against the project's createmeta so that the correct
+// project-scoped id is sent — sending only the name can fail with
+// "Invalid issue type" when the same name exists in multiple schemes.
 func (c *Client) CreateIssue(project, issueType, summary, description, dueDate, parentKey string) (*CreateIssueResponse, error) {
+	it, err := c.resolveIssueType(project, issueType)
+	if err != nil {
+		return nil, err
+	}
 	req := CreateIssueRequest{
 		Fields: CreateIssueFields{
 			Project:   ProjectKey{Key: project},
 			Summary:   summary,
-			IssueType: IssueType{Name: issueType},
+			IssueType: it,
 		},
 	}
 	if description != "" {
@@ -72,6 +80,46 @@ func (c *Client) CreateIssue(project, issueType, summary, description, dueDate, 
 		return nil, err
 	}
 	return &resp, nil
+}
+
+// resolveIssueType turns a user-supplied issue type (numeric id or name) into
+// an IssueType that the create endpoint can resolve unambiguously. Names are
+// looked up via the project's createmeta so we send the project-scoped id.
+func (c *Client) resolveIssueType(project, issueType string) (IssueType, error) {
+	if issueType == "" {
+		return IssueType{}, fmt.Errorf("issue type is required")
+	}
+	if isAllDigits(issueType) {
+		return IssueType{ID: issueType}, nil
+	}
+	types, err := c.GetIssueTypes(project)
+	if err != nil {
+		return IssueType{}, fmt.Errorf("resolving issue type %q: %w", issueType, err)
+	}
+	target := strings.ToLower(issueType)
+	for _, t := range types {
+		if strings.ToLower(t.Name) == target {
+			return IssueType{ID: t.ID}, nil
+		}
+	}
+	names := make([]string, 0, len(types))
+	for _, t := range types {
+		names = append(names, t.Name)
+	}
+	return IssueType{}, fmt.Errorf("issue type %q not creatable in project %q; available: %s",
+		issueType, project, strings.Join(names, ", "))
+}
+
+func isAllDigits(s string) bool {
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 // UpdateIssue updates an existing issue's summary, description, due date, and/or parent.
