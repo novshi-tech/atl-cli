@@ -73,7 +73,7 @@ atl jira issue create --project PROJ --summary "新機能の実装" --type Story
 
 ### 課題を更新する (`issue update`)
 
-既存の課題のサマリー、説明、ステータス、担当者を更新する。
+既存の課題のサマリー、説明、ステータス、担当者、ストーリーポイントを更新する。
 
 ```bash
 # サマリーを更新
@@ -88,9 +88,14 @@ atl jira issue update --key PROJ-123 --assignee "5b10ac8d14c052e1e6c2e251"
 # 担当者を解除
 atl jira issue update --key PROJ-123 --assignee none
 
+# ストーリーポイントを設定
+atl jira issue update --key PROJ-123 --story-points 3
+
 # 複数のフィールドを同時に更新
 atl jira issue update --key PROJ-123 --summary "新サマリー" --status "Done"
 ```
+
+> `--story-points` はプロジェクトの「Story Points」または「Story point estimate」カスタムフィールドをサイトから自動解決して設定する。どちらのフィールドもサイトに存在しない場合はエラーになる。
 
 ### コメントを追加する (`issue comment`)
 
@@ -153,10 +158,22 @@ atl jira sprint list --board 42 --state active
 
 ### スプリント内の課題一覧 (`sprint issues`)
 
-特定のスプリントに含まれる課題を一覧表示する。
+特定のスプリントに含まれる課題を一覧表示する。ストーリーポイント（設定されていれば）も一緒に表示される。
 
 ```bash
 atl jira sprint issues --sprint 100
+```
+
+### ボード ID を使わずにアクティブなスプリントの課題を探す
+
+ボード ID や スプリント ID を事前に調べなくても、`issue list` の JQL で `openSprints()` / `currentUser()` を使えば、アクティブなスプリントで自分が担当している課題を直接検索できる。
+
+```bash
+# アクティブなスプリントで自分が担当している課題
+atl jira issue list --jql "sprint in openSprints() AND assignee = currentUser()" --json
+
+# 特定プロジェクトに絞る場合
+atl jira issue list --jql "project = PROJ AND sprint in openSprints() AND assignee = currentUser() AND statusCategory != Done"
 ```
 
 ## 共通フラグ

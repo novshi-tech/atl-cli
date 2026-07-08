@@ -1,11 +1,12 @@
 package cmd
 
 type JSONIssueItem struct {
-	Key      string `json:"key"`
-	Summary  string `json:"summary"`
-	Status   string `json:"status"`
-	Type     string `json:"type"`
-	Assignee string `json:"assignee"`
+	Key         string   `json:"key"`
+	Summary     string   `json:"summary"`
+	Status      string   `json:"status"`
+	Type        string   `json:"type"`
+	Assignee    string   `json:"assignee"`
+	StoryPoints *float64 `json:"storyPoints,omitempty"`
 }
 
 type JSONIssueDetail struct {
@@ -18,6 +19,7 @@ type JSONIssueDetail struct {
 	Description string               `json:"description"`
 	DueDate     string               `json:"duedate,omitempty"`
 	Epic        string               `json:"epic,omitempty"`
+	StoryPoints *float64             `json:"storyPoints,omitempty"`
 	Comments    []JSONCommentItem    `json:"comments,omitempty"`
 	Attachments []JSONAttachmentItem `json:"attachments,omitempty"`
 }

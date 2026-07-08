@@ -20,6 +20,12 @@ type Client struct {
 	email      string
 	apiToken   string
 	httpClient *http.Client
+
+	// storyPointsFieldID caches the resolved custom field id for Story
+	// Points within the lifetime of this client, since resolving it
+	// requires a lookup against /rest/api/3/field.
+	storyPointsFieldID    string
+	storyPointsFieldKnown bool
 }
 
 // NewClient creates a new Jira client from credentials.
@@ -180,21 +186,49 @@ func (c *Client) AddComment(key, body string) error {
 
 // SearchIssues searches for issues using JQL.
 func (c *Client) SearchIssues(jql string, maxResults int) (*SearchResponse, error) {
-	path := fmt.Sprintf("/rest/api/3/search/jql?jql=%s&maxResults=%d&fields=summary,status,issuetype,assignee,parent",
-		urlEncode(jql), maxResults)
-	var resp SearchResponse
-	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+	spFieldID, err := c.resolveStoryPointsFieldID()
+	if err != nil {
 		return nil, err
 	}
+	fieldsParam := "summary,status,issuetype,assignee,parent"
+	if spFieldID != "" {
+		fieldsParam += "," + spFieldID
+	}
+	path := fmt.Sprintf("/rest/api/3/search/jql?jql=%s&maxResults=%d&fields=%s",
+		urlEncode(jql), maxResults, fieldsParam)
+	raw, err := c.doRequestRaw("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	var resp SearchResponse
+	if err := json.Unmarshal(raw, &resp); err != nil {
+		return nil, fmt.Errorf("unmarshaling response: %w", err)
+	}
+	populateStoryPoints(raw, resp.Issues, spFieldID)
 	return &resp, nil
 }
 
 // GetIssue retrieves a single issue with full details.
 func (c *Client) GetIssue(key string) (*Issue, error) {
-	path := fmt.Sprintf("/rest/api/3/issue/%s?fields=summary,status,issuetype,assignee,description,comment,duedate,attachment,parent", key)
-	var resp Issue
-	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+	spFieldID, err := c.resolveStoryPointsFieldID()
+	if err != nil {
 		return nil, err
+	}
+	fieldsParam := "summary,status,issuetype,assignee,description,comment,duedate,attachment,parent"
+	if spFieldID != "" {
+		fieldsParam += "," + spFieldID
+	}
+	path := fmt.Sprintf("/rest/api/3/issue/%s?fields=%s", key, fieldsParam)
+	raw, err := c.doRequestRaw("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	var resp Issue
+	if err := json.Unmarshal(raw, &resp); err != nil {
+		return nil, fmt.Errorf("unmarshaling response: %w", err)
+	}
+	if spFieldID != "" {
+		resp.Fields.StoryPoints = extractFloatField(raw, spFieldID)
 	}
 	return &resp, nil
 }
@@ -259,12 +293,133 @@ func (c *Client) ListSprints(boardID int, state string) (*SprintsResponse, error
 
 // GetSprintIssues retrieves issues in a sprint.
 func (c *Client) GetSprintIssues(sprintID int) (*SprintIssuesResponse, error) {
-	path := fmt.Sprintf("/rest/agile/1.0/sprint/%d/issue?fields=summary,status,issuetype,assignee", sprintID)
-	var resp SprintIssuesResponse
-	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+	spFieldID, err := c.resolveStoryPointsFieldID()
+	if err != nil {
 		return nil, err
 	}
+	fieldsParam := "summary,status,issuetype,assignee"
+	if spFieldID != "" {
+		fieldsParam += "," + spFieldID
+	}
+	path := fmt.Sprintf("/rest/agile/1.0/sprint/%d/issue?fields=%s", sprintID, fieldsParam)
+	raw, err := c.doRequestRaw("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+	var resp SprintIssuesResponse
+	if err := json.Unmarshal(raw, &resp); err != nil {
+		return nil, fmt.Errorf("unmarshaling response: %w", err)
+	}
+	populateStoryPoints(raw, resp.Issues, spFieldID)
 	return &resp, nil
+}
+
+// GetFields returns all fields known to this Jira site, including custom
+// fields. Used to resolve site-specific custom field ids (e.g. Story
+// Points) by name.
+func (c *Client) GetFields() ([]Field, error) {
+	var resp []Field
+	if err := c.doRequest("GET", "/rest/api/3/field", nil, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+// storyPointsFieldNames lists the field names Jira Cloud uses for story
+// points across different project templates: "Story Points" on
+// company-managed (classic) software projects, "Story point estimate" on
+// team-managed projects.
+var storyPointsFieldNames = []string{"story points", "story point estimate"}
+
+// resolveStoryPointsFieldID looks up the custom field id for Story Points on
+// this site, caching the result for the lifetime of the client. Returns ""
+// (no error) if the site has no such field, so read paths can simply skip
+// enrichment; SetStoryPoints treats an empty id as a hard error.
+func (c *Client) resolveStoryPointsFieldID() (string, error) {
+	if c.storyPointsFieldKnown {
+		return c.storyPointsFieldID, nil
+	}
+	fields, err := c.GetFields()
+	if err != nil {
+		return "", fmt.Errorf("resolving story points field: %w", err)
+	}
+	for _, f := range fields {
+		for _, candidate := range storyPointsFieldNames {
+			if strings.ToLower(f.Name) == candidate {
+				c.storyPointsFieldID = f.ID
+				c.storyPointsFieldKnown = true
+				return f.ID, nil
+			}
+		}
+	}
+	c.storyPointsFieldKnown = true
+	return "", nil
+}
+
+// SetStoryPoints sets the Story Points value on an issue.
+func (c *Client) SetStoryPoints(key string, points float64) error {
+	fieldID, err := c.resolveStoryPointsFieldID()
+	if err != nil {
+		return err
+	}
+	if fieldID == "" {
+		return fmt.Errorf("no Story Points field found on this Jira site (looked for: %s)", strings.Join(storyPointsFieldNames, ", "))
+	}
+	req := map[string]interface{}{
+		"fields": map[string]interface{}{fieldID: points},
+	}
+	return c.doRequest("PUT", "/rest/api/3/issue/"+key, req, nil)
+}
+
+// extractFloatField reads a numeric value at raw.fields[fieldID] from a raw
+// single-issue JSON response, returning nil if absent, null, or malformed.
+// Used to pull dynamically-keyed custom fields (like Story Points) out of
+// responses whose static struct fields can't have a per-site JSON tag.
+func extractFloatField(raw []byte, fieldID string) *float64 {
+	var wrapper struct {
+		Fields map[string]json.RawMessage `json:"fields"`
+	}
+	if err := json.Unmarshal(raw, &wrapper); err != nil {
+		return nil
+	}
+	v, ok := wrapper.Fields[fieldID]
+	if !ok || string(v) == "null" {
+		return nil
+	}
+	var f float64
+	if err := json.Unmarshal(v, &f); err != nil {
+		return nil
+	}
+	return &f
+}
+
+// populateStoryPoints fills in StoryPoints on each issue from the raw
+// "issues" array in a search/sprint-issues response, matching by index.
+func populateStoryPoints(raw []byte, issues []Issue, fieldID string) {
+	if fieldID == "" {
+		return
+	}
+	var wrapper struct {
+		Issues []struct {
+			Fields map[string]json.RawMessage `json:"fields"`
+		} `json:"issues"`
+	}
+	if err := json.Unmarshal(raw, &wrapper); err != nil {
+		return
+	}
+	for i := range issues {
+		if i >= len(wrapper.Issues) {
+			break
+		}
+		v, ok := wrapper.Issues[i].Fields[fieldID]
+		if !ok || string(v) == "null" {
+			continue
+		}
+		var f float64
+		if json.Unmarshal(v, &f) == nil {
+			issues[i].Fields.StoryPoints = &f
+		}
+	}
 }
 
 // ListProjects lists projects visible to the authenticated user.
@@ -326,18 +481,34 @@ func urlEncode(s string) string {
 }
 
 func (c *Client) doRequest(method, path string, body interface{}, result interface{}) error {
+	respBody, err := c.doRequestRaw(method, path, body)
+	if err != nil {
+		return err
+	}
+	if result != nil && len(respBody) > 0 {
+		if err := json.Unmarshal(respBody, result); err != nil {
+			return fmt.Errorf("unmarshaling response: %w", err)
+		}
+	}
+	return nil
+}
+
+// doRequestRaw performs the request and returns the raw response body,
+// letting callers decode it more than once (e.g. into a typed struct and
+// also into a map to pick out a dynamically-keyed custom field).
+func (c *Client) doRequestRaw(method, path string, body interface{}) ([]byte, error) {
 	var bodyReader io.Reader
 	if body != nil {
 		data, err := json.Marshal(body)
 		if err != nil {
-			return fmt.Errorf("marshaling request: %w", err)
+			return nil, fmt.Errorf("marshaling request: %w", err)
 		}
 		bodyReader = bytes.NewReader(data)
 	}
 
 	req, err := http.NewRequest(method, c.baseURL+path, bodyReader)
 	if err != nil {
-		return fmt.Errorf("creating request: %w", err)
+		return nil, fmt.Errorf("creating request: %w", err)
 	}
 	req.SetBasicAuth(c.email, c.apiToken)
 	req.Header.Set("Content-Type", "application/json")
@@ -345,27 +516,22 @@ func (c *Client) doRequest(method, path string, body interface{}, result interfa
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("executing request: %w", err)
+		return nil, fmt.Errorf("executing request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("reading response: %w", err)
+		return nil, fmt.Errorf("reading response: %w", err)
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		var apiErr APIError
 		if json.Unmarshal(respBody, &apiErr) == nil && apiErr.String() != "" {
-			return fmt.Errorf("jira API error (%d): %s", resp.StatusCode, apiErr.String())
+			return nil, fmt.Errorf("jira API error (%d): %s", resp.StatusCode, apiErr.String())
 		}
-		return fmt.Errorf("jira API error (%d): %s", resp.StatusCode, string(respBody))
+		return nil, fmt.Errorf("jira API error (%d): %s", resp.StatusCode, string(respBody))
 	}
 
-	if result != nil && len(respBody) > 0 {
-		if err := json.Unmarshal(respBody, result); err != nil {
-			return fmt.Errorf("unmarshaling response: %w", err)
-		}
-	}
-	return nil
+	return respBody, nil
 }

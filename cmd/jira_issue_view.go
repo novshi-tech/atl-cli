@@ -40,13 +40,14 @@ func runIssueView(cmd *cobra.Command, args []string) error {
 
 	if jsonMode(cmd) {
 		detail := JSONIssueDetail{
-			Key:      issue.Key,
-			Summary:  issue.Fields.Summary,
-			Status:   issue.Fields.Status.Name,
-			Type:     issue.Fields.IssueType.Name,
-			Assignee: assignee,
-			URL:      fmt.Sprintf("%s/browse/%s", client.BaseURL(), issue.Key),
-			DueDate:  issue.Fields.DueDate,
+			Key:         issue.Key,
+			Summary:     issue.Fields.Summary,
+			Status:      issue.Fields.Status.Name,
+			Type:        issue.Fields.IssueType.Name,
+			Assignee:    assignee,
+			URL:         fmt.Sprintf("%s/browse/%s", client.BaseURL(), issue.Key),
+			DueDate:     issue.Fields.DueDate,
+			StoryPoints: issue.Fields.StoryPoints,
 		}
 		if issue.Fields.Parent != nil {
 			detail.Epic = issue.Fields.Parent.Key
@@ -91,6 +92,9 @@ func runIssueView(cmd *cobra.Command, args []string) error {
 	}
 	if issue.Fields.DueDate != "" {
 		fmt.Printf("Due:       %s\n", issue.Fields.DueDate)
+	}
+	if issue.Fields.StoryPoints != nil {
+		fmt.Printf("SP:        %s\n", formatStoryPoints(issue.Fields.StoryPoints))
 	}
 	fmt.Printf("URL:       %s/browse/%s\n", client.BaseURL(), issue.Key)
 

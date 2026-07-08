@@ -46,6 +46,28 @@ atl jira sprint list --board 42 --state active
 atl jira sprint issues --sprint 100
 ```
 
+## 3.5. アクティブなスプリントで自分が担当しているタスクを扱う
+
+ボード ID / スプリント ID を調べなくても、JQL の `openSprints()` と `currentUser()` でアクティブなスプリント × 自分担当の課題を直接検索できる。
+
+```bash
+# アクティブなスプリントで自分が担当しているタスクを確認
+atl jira issue list --jql "sprint in openSprints() AND assignee = currentUser() AND statusCategory != Done" --json
+
+# 1件ずつ着手する
+atl jira issue update --key PROJ-123 --status "In Progress"
+```
+
+ストーリーポイントを設定する場合は `issue update` に `--story-points` を指定する（値は Fibonacci 数のような小数でも可）。
+
+```bash
+# 対象課題にストーリーポイントを設定
+atl jira issue update --key PROJ-123 --story-points 3
+atl jira issue update --key PROJ-124 --story-points 5
+```
+
+複数課題にまとめて設定したい場合は、`issue list --json` の結果を `jq` などでパースしてキーを取り出し、ループで `issue update --story-points` を呼び出す。
+
 ## 4. バグ報告と対応
 
 バグを報告し、対応する。

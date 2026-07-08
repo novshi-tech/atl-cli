@@ -99,11 +99,12 @@ func runSprintIssues(cmd *cobra.Command, args []string) error {
 				assignee = issue.Fields.Assignee.DisplayName
 			}
 			items[i] = JSONIssueItem{
-				Key:      issue.Key,
-				Summary:  issue.Fields.Summary,
-				Status:   issue.Fields.Status.Name,
-				Type:     issue.Fields.IssueType.Name,
-				Assignee: assignee,
+				Key:         issue.Key,
+				Summary:     issue.Fields.Summary,
+				Status:      issue.Fields.Status.Name,
+				Type:        issue.Fields.IssueType.Name,
+				Assignee:    assignee,
+				StoryPoints: issue.Fields.StoryPoints,
 			}
 		}
 		return printJSON(items)
@@ -120,9 +121,10 @@ func runSprintIssues(cmd *cobra.Command, args []string) error {
 		if issue.Fields.Assignee != nil {
 			assignee = issue.Fields.Assignee.DisplayName
 		}
-		fmt.Printf("%-12s  %-15s  %-20s  %s\n",
+		fmt.Printf("%-12s  %-15s  %-6s  %-20s  %s\n",
 			issue.Key,
 			issue.Fields.Status.Name,
+			formatStoryPoints(issue.Fields.StoryPoints),
 			assignee,
 			issue.Fields.Summary,
 		)

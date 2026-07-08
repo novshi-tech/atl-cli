@@ -23,6 +23,7 @@ func init() {
 	issueUpdateCmd.Flags().String("epic", "", "Epic key to link this issue to")
 	issueUpdateCmd.Flags().String("parent", "", "Parent issue key (e.g. parent task for a sub-task)")
 	issueUpdateCmd.MarkFlagsMutuallyExclusive("epic", "parent")
+	issueUpdateCmd.Flags().Float64("story-points", 0, "Story points estimate")
 	issueCmd.AddCommand(issueUpdateCmd)
 }
 
@@ -46,12 +47,14 @@ func runIssueUpdate(cmd *cobra.Command, args []string) error {
 	if cmd.Flags().Changed("parent") {
 		parentKey = parent
 	}
+	storyPoints, _ := cmd.Flags().GetFloat64("story-points")
+	storyPointsChanged := cmd.Flags().Changed("story-points")
 
-	if summary == "" && description == "" && status == "" && !assigneeChanged && due == "" && !parentChanged {
+	if summary == "" && description == "" && status == "" && !assigneeChanged && due == "" && !parentChanged && !storyPointsChanged {
 		if jsonMode(cmd) {
 			return printJSON(JSONMutationResult{Key: key, URL: fmt.Sprintf("%s/browse/%s", client.BaseURL(), key)})
 		}
-		fmt.Println("Nothing to update. Specify --summary, --description, --status, --assignee, --due, --epic, or --parent.")
+		fmt.Println("Nothing to update. Specify --summary, --description, --status, --assignee, --due, --epic, --parent, or --story-points.")
 		fmt.Printf("URL: %s/browse/%s\n", client.BaseURL(), key)
 		return nil
 	}
@@ -89,6 +92,15 @@ func runIssueUpdate(cmd *cobra.Command, args []string) error {
 		}
 		if !jsonMode(cmd) {
 			fmt.Printf("Transitioned %s to %q\n", key, status)
+		}
+	}
+
+	if storyPointsChanged {
+		if err := client.SetStoryPoints(key, storyPoints); err != nil {
+			return err
+		}
+		if !jsonMode(cmd) {
+			fmt.Printf("Set story points for %s to %s\n", key, formatStoryPoints(&storyPoints))
 		}
 	}
 

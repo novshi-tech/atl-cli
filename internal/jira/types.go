@@ -104,6 +104,9 @@ type IssueFields struct {
 	DueDate     string         `json:"duedate,omitempty"`
 	Attachment  []Attachment   `json:"attachment,omitempty"`
 	Parent      *ParentRef     `json:"parent,omitempty"`
+	// StoryPoints is populated separately since its Jira field id (e.g.
+	// customfield_10016) varies per site; it is not a static JSON key.
+	StoryPoints *float64 `json:"-"`
 }
 
 // Attachment represents a file attached to a Jira issue.
@@ -215,4 +218,19 @@ type CreateMetaIssueTypesResponse struct {
 	StartAt    int               `json:"startAt"`
 	MaxResults int               `json:"maxResults"`
 	Total      int               `json:"total"`
+}
+
+// Field represents a Jira field definition, as returned by
+// /rest/api/3/field. Used to resolve the site-specific custom field id for
+// fields like Story Points that don't have a stable id across instances.
+type Field struct {
+	ID     string       `json:"id"`
+	Name   string       `json:"name"`
+	Custom bool         `json:"custom"`
+	Schema *FieldSchema `json:"schema,omitempty"`
+}
+
+type FieldSchema struct {
+	Type   string `json:"type"`
+	Custom string `json:"custom,omitempty"`
 }

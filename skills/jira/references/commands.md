@@ -97,10 +97,13 @@ PROJ-125      Done             Jane Smith            API ドキュメント更�
     "summary": "ログイン画面のバグ修正",
     "status": "In Progress",
     "type": "Bug",
-    "assignee": "John Doe"
+    "assignee": "John Doe",
+    "storyPoints": 3
   }
 ]
 ```
+
+`storyPoints` はサイトに Story Points（または Story point estimate）フィールドが存在し、かつ値が設定されている課題でのみ出力される（それ以外は省略される）。
 
 ## jira issue view
 
@@ -124,6 +127,7 @@ Status:    In Progress
 Type:      Bug
 Assignee:  John Doe
 Epic:      PROJ-10
+SP:        3
 URL:       https://example.atlassian.net/browse/PROJ-123
 
 --- Description ---
@@ -146,6 +150,7 @@ URL:       https://example.atlassian.net/browse/PROJ-123
   "url": "https://example.atlassian.net/browse/PROJ-123",
   "description": "ログイン画面でエラーが発生する問題を修正する。",
   "epic": "PROJ-10",
+  "storyPoints": 3,
   "comments": [
     {
       "author": "Jane Smith",
@@ -158,7 +163,7 @@ URL:       https://example.atlassian.net/browse/PROJ-123
 
 ## jira issue update
 
-既存の課題を更新する。`--summary`、`--description`、`--status`、`--assignee`、`--epic`、`--parent` のいずれかを指定する。
+既存の課題を更新する。`--summary`、`--description`、`--status`、`--assignee`、`--epic`、`--parent`、`--story-points` のいずれかを指定する。
 
 ```
 atl jira issue update [flags]
@@ -174,8 +179,17 @@ atl jira issue update [flags]
 | `--due` | - | No | - | 期日（YYYY-MM-DD） |
 | `--epic` | - | No | - | 紐づけるエピックのキー（例: `PROJ-10`） |
 | `--parent` | - | No | - | 親課題のキー（例: サブタスクの親タスク `PROJ-123`）。`--epic` と同じ `parent` フィールドを設定するため併用不可 |
+| `--story-points` | - | No | - | ストーリーポイント（Story Points / Story point estimate フィールドをサイトから自動解決して設定。値は小数可、例: `2.5`） |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
+
+**出力例:**
+```
+Set story points for PROJ-123 to 3
+URL: https://example.atlassian.net/browse/PROJ-123
+```
+
+> `--story-points` は Story Points（company-managed プロジェクト）または Story point estimate（team-managed プロジェクト）という名前のフィールドをサイトの `/rest/api/3/field` から探して設定する。どちらの名前のフィールドもサイトに存在しない場合はエラーを返す。
 
 ## jira issue comment
 
@@ -305,9 +319,11 @@ atl jira sprint list [flags]
 ]
 ```
 
+> ボード ID を調べずにアクティブなスプリントの課題を探したい場合は、`atl jira issue list --jql "sprint in openSprints() AND assignee = currentUser()"` の方が手軽（`sprint list` → `sprint issues` の2段階が不要）。
+
 ## jira sprint issues
 
-スプリント内の課題一覧を表示する。
+スプリント内の課題一覧を表示する。ストーリーポイントが設定されていれば併せて表示される。
 
 ```
 atl jira sprint issues [flags]
@@ -318,6 +334,20 @@ atl jira sprint issues [flags]
 | `--sprint` | - | Yes | - | スプリント ID |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
+
+**JSON 出力例** (`--json`):
+```json
+[
+  {
+    "key": "PROJ-123",
+    "summary": "ログイン画面のバグ修正",
+    "status": "In Progress",
+    "type": "Bug",
+    "assignee": "John Doe",
+    "storyPoints": 3
+  }
+]
+```
 
 ## jira user search
 
