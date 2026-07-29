@@ -24,7 +24,19 @@ type SiteCredentials struct {
 
 // NewStore returns a CredentialStore, trying keyring first, then falling back to pass.
 // In sandbox environments (SANDBOX env var set), keyring probe is skipped.
+//
+// ATL_CRED_BACKEND=boid-cli selects BoidCLIStore unconditionally, ahead of
+// both. This requires an explicit opt-in rather than auto-detecting `boid`
+// on PATH: an operator's own workstation commonly has boid installed too,
+// and silently preferring it there would divert `atl configure` away from
+// the keyring/pass credentials that workstation already relies on. The
+// var is meant to be set only in the one place BoidCLIStore actually
+// applies — a boid host_command's env declaration for atl (host_commands.yaml
+// on the boid daemon side) — never globally.
 func NewStore() (CredentialStore, error) {
+	if os.Getenv("ATL_CRED_BACKEND") == "boid-cli" {
+		return NewBoidCLIStore()
+	}
 	if os.Getenv("SANDBOX") == "" {
 		ks := &KeyringStore{}
 		if err := ks.Probe(); err == nil {
