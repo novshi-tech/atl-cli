@@ -336,3 +336,38 @@ atl bitbucket pr comment create --repo my-app --pr 42 \
 atl bitbucket pr comment create --repo my-app --pr 42 \
     --parent 101 --body "確認しました"
 ```
+
+## bitbucket pr comment delete
+
+プルリクエストのコメントを削除する。Bitbucket 側の仕様によりソフトデリートで、削除後もコメント自体は一覧に残るが本文が空になる。
+
+```
+atl bitbucket pr comment delete [flags]
+```
+
+| フラグ | 短縮 | 必須 | デフォルト | 説明 |
+|--------|------|------|-----------|------|
+| `--workspace` | - | No | サイト設定値 | ワークスペースのスラッグ |
+| `--repo` | - | Yes | - | リポジトリのスラッグ |
+| `--pr` | - | Yes | - | プルリクエスト ID |
+| `--id` | - | Yes | - | 削除するコメントの ID |
+| `--site` | - | No | デフォルトサイト | サイトエイリアス |
+| `--json` | - | No | `false` | JSON 形式で出力 |
+
+```bash
+atl bitbucket pr comment delete --repo my-app --pr 42 --id 201
+```
+
+**出力例:**
+```
+Comment #201 deleted from pull request #42
+URL: https://bitbucket.org/myteam/my-app/pull-requests/42
+```
+
+**JSON 出力例** (`--json`):
+```json
+{
+  "key": "201",
+  "url": "https://bitbucket.org/myteam/my-app/pull-requests/42"
+}
+```

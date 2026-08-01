@@ -134,6 +134,12 @@ func (c *Client) CreatePRComment(workspace, repoSlug string, prID int, req Creat
 	return &resp, nil
 }
 
+// DeletePRComment deletes a comment on a pull request.
+func (c *Client) DeletePRComment(workspace, repoSlug string, prID, commentID int) error {
+	path := fmt.Sprintf("/repositories/%s/%s/pullrequests/%d/comments/%d", workspace, repoSlug, prID, commentID)
+	return c.doRequest("DELETE", path, nil, nil)
+}
+
 func (c *Client) doRequest(method, path string, body any, result any) error {
 	return c.doRequestURL(method, baseURL+path, body, result)
 }
