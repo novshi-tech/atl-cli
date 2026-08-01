@@ -94,14 +94,24 @@ func (c *Client) CreatePullRequest(workspace, repoSlug string, req CreatePRReque
 	return &resp, nil
 }
 
-// ListPRComments lists comments on a pull request.
+// ListPRComments lists all comments on a pull request, following pagination
+// until every page has been fetched (the API caps each page at 10 comments).
 func (c *Client) ListPRComments(workspace, repoSlug string, prID int) (*PRCommentsResponse, error) {
 	path := fmt.Sprintf("/repositories/%s/%s/pullrequests/%d/comments", workspace, repoSlug, prID)
-	var resp PRCommentsResponse
-	if err := c.doRequest("GET", path, nil, &resp); err != nil {
-		return nil, err
+	var all PRCommentsResponse
+	url := baseURL + path
+	for url != "" {
+		var page PRCommentsResponse
+		if err := c.doRequestURL("GET", url, nil, &page); err != nil {
+			return nil, err
+		}
+		all.Values = append(all.Values, page.Values...)
+		all.PageLen = page.PageLen
+		all.Size = page.Size
+		all.Page = page.Page
+		url = page.Next
 	}
-	return &resp, nil
+	return &all, nil
 }
 
 // GetPRComment retrieves a single comment on a pull request.
@@ -125,6 +135,12 @@ func (c *Client) CreatePRComment(workspace, repoSlug string, prID int, req Creat
 }
 
 func (c *Client) doRequest(method, path string, body any, result any) error {
+	return c.doRequestURL(method, baseURL+path, body, result)
+}
+
+// doRequestURL is like doRequest but takes a fully-qualified URL, for
+// following pagination links returned by the API (e.g. PRCommentsResponse.Next).
+func (c *Client) doRequestURL(method, url string, body any, result any) error {
 	var bodyReader io.Reader
 	if body != nil {
 		data, err := json.Marshal(body)
@@ -134,7 +150,7 @@ func (c *Client) doRequest(method, path string, body any, result any) error {
 		bodyReader = bytes.NewReader(data)
 	}
 
-	req, err := http.NewRequest(method, baseURL+path, bodyReader)
+	req, err := http.NewRequest(method, url, bodyReader)
 	if err != nil {
 		return fmt.Errorf("creating request: %w", err)
 	}
