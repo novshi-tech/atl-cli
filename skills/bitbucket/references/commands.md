@@ -300,9 +300,9 @@ atl bitbucket pr comment create [flags]
 | `--repo` | - | Yes | - | リポジトリのスラッグ |
 | `--pr` | - | Yes | - | プルリクエスト ID |
 | `--body` | `-b` | Yes | - | コメント本文 |
-| `--path` | - | No | - | インラインコメントのファイルパス |
-| `--line` | - | No | - | インラインコメントの行番号 |
-| `--parent` | - | No | - | 返信先のコメント ID（コメントへの返信に使用） |
+| `--path` | - | No | - | インラインコメントのファイルパス（`--parent` 指定時は無視され、返信先から自動継承） |
+| `--line` | - | No | - | インラインコメントの行番号（`--parent` 指定時は無視され、返信先から自動継承） |
+| `--parent` | - | No | - | 返信先のコメント ID（コメントへの返信に使用）。インライン位置（path/from/to）は返信先コメントから自動的に継承される |
 | `--site` | - | No | デフォルトサイト | サイトエイリアス |
 | `--json` | - | No | `false` | JSON 形式で出力 |
 
@@ -322,18 +322,17 @@ URL: https://bitbucket.org/myteam/my-app/pull-requests/42
 
 **インラインコメントへの返信**:
 
-返信先のコメント ID は `bitbucket pr comment` の出力（`#<id>` あるいは JSON の `id`）から取得する。インライン返信では返信先と同じ `--path` / `--line` を指定する。
+返信先のコメント ID は `bitbucket pr comment` の出力（`#<id>` あるいは JSON の `id`）から取得する。`--parent` を指定するだけでよく、`--path` / `--line` は返信先コメントの内容から自動的に継承されるため指定不要（指定しても無視される）。返信先が inline 位置を持つ from + to 両方の範囲（変更されていない行への参照など）である場合、手動で `--path` / `--line` を組み立てると API に 400 で拒否されることがあるため、常に `--parent` のみを使うこと。
 
 ```bash
-# 1) まずコメント一覧から返信先インラインコメントの id を取得
+# 1) まずコメント一覧から返信先コメントの id を取得
 atl bitbucket pr comment --repo my-app --pr 42 --json
 
-# 2) 同じ path / line と --parent でインライン返信
+# 2) --parent だけでインライン返信（path/from/to は自動継承）
 atl bitbucket pr comment create --repo my-app --pr 42 \
-    --path src/auth.go --line 45 --parent 201 \
-    --body "指摘の通り修正しました"
+    --parent 201 --body "指摘の通り修正しました"
 
-# 通常コメント（非インライン）への返信は --path / --line を省略
+# 通常コメント（非インライン）への返信も同様に --parent のみでよい
 atl bitbucket pr comment create --repo my-app --pr 42 \
     --parent 101 --body "確認しました"
 ```

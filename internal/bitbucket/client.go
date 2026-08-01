@@ -104,6 +104,16 @@ func (c *Client) ListPRComments(workspace, repoSlug string, prID int) (*PRCommen
 	return &resp, nil
 }
 
+// GetPRComment retrieves a single comment on a pull request.
+func (c *Client) GetPRComment(workspace, repoSlug string, prID, commentID int) (*PRComment, error) {
+	path := fmt.Sprintf("/repositories/%s/%s/pullrequests/%d/comments/%d", workspace, repoSlug, prID, commentID)
+	var resp PRComment
+	if err := c.doRequest("GET", path, nil, &resp); err != nil {
+		return nil, err
+	}
+	return &resp, nil
+}
+
 // CreatePRComment creates a comment on a pull request.
 func (c *Client) CreatePRComment(workspace, repoSlug string, prID int, req CreatePRCommentRequest) (*PRComment, error) {
 	path := fmt.Sprintf("/repositories/%s/%s/pullrequests/%d/comments", workspace, repoSlug, prID)

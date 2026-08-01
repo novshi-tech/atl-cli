@@ -21,9 +21,9 @@ func init() {
 	bbPRCommentCreateCmd.MarkFlagRequired("pr")
 	bbPRCommentCreateCmd.Flags().StringP("body", "b", "", "Comment body (required)")
 	bbPRCommentCreateCmd.MarkFlagRequired("body")
-	bbPRCommentCreateCmd.Flags().String("path", "", "File path for inline comment")
-	bbPRCommentCreateCmd.Flags().Int("line", 0, "Line number for inline comment")
-	bbPRCommentCreateCmd.Flags().Int("parent", 0, "Parent comment ID (for replies)")
+	bbPRCommentCreateCmd.Flags().String("path", "", "File path for inline comment (ignored when --parent is set; inherited from the parent comment)")
+	bbPRCommentCreateCmd.Flags().Int("line", 0, "Line number for inline comment (ignored when --parent is set; inherited from the parent comment)")
+	bbPRCommentCreateCmd.Flags().Int("parent", 0, "Parent comment ID (for replies); inline position, if any, is inherited from the parent")
 	bbPRCommentCmd.AddCommand(bbPRCommentCreateCmd)
 }
 
@@ -48,16 +48,22 @@ func runBBPRCommentCreate(cmd *cobra.Command, args []string) error {
 		Content: bitbucket.PRCommentContent{Raw: body},
 	}
 
-	if path != "" {
+	if parentID > 0 {
+		parent, err := client.GetPRComment(workspace, repo, prID, parentID)
+		if err != nil {
+			return fmt.Errorf("resolving parent comment #%d: %w", parentID, err)
+		}
+		req.Parent = &bitbucket.PRCommentParent{ID: parentID}
+		// Replies must anchor to the exact from/to the parent used; reconstructing
+		// it from --path/--line can mismatch (e.g. a parent spanning from+to) and
+		// gets rejected by the API, so inherit it verbatim instead.
+		req.Inline = parent.Inline
+	} else if path != "" {
 		inline := &bitbucket.PRInline{Path: path}
 		if line > 0 {
 			inline.To = &line
 		}
 		req.Inline = inline
-	}
-
-	if parentID > 0 {
-		req.Parent = &bitbucket.PRCommentParent{ID: parentID}
 	}
 
 	comment, err := client.CreatePRComment(workspace, repo, prID, req)
