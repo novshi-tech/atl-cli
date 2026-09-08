@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/cobra"
 	"github.com/novshi-tech/atl-cli/internal/auth"
 	"github.com/novshi-tech/atl-cli/internal/bitbucket"
 	"github.com/novshi-tech/atl-cli/internal/jira"
+	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
@@ -38,46 +38,62 @@ func printJSON(v any) error {
 	return enc.Encode(v)
 }
 
-// newJiraClient resolves the site alias from the --site flag (or default) and returns a Jira client.
-func newJiraClient(cmd *cobra.Command) (*jira.Client, error) {
+// loadSiteCredentials returns the credentials a command should use.
+//
+// Credentials supplied through the environment (ATL_BASE_URL / ATL_EMAIL /
+// ATL_API_TOKEN, see auth.LoadFromEnv) win outright and never touch the
+// credential store; otherwise the site alias is resolved from --site, then
+// ATL_SITE, then the stored default site, and loaded from the store.
+func loadSiteCredentials(cmd *cobra.Command) (auth.SiteCredentials, error) {
+	if creds, ok, err := auth.LoadFromEnv(); ok || err != nil {
+		return creds, err
+	}
+
 	store, err := auth.NewStore()
 	if err != nil {
-		return nil, err
+		return auth.SiteCredentials{}, err
 	}
 
-	site, _ := cmd.Flags().GetString("site")
-	if site == "" {
-		site = os.Getenv("ATL_SITE")
-	}
-	if site == "" {
-		site, err = auth.GetDefaultSite(store)
-		if err != nil {
-			return nil, fmt.Errorf("no --site specified and no default site configured; run 'atl configure --site <name>' first")
-		}
+	site, err := resolveSiteAlias(cmd, store)
+	if err != nil {
+		return auth.SiteCredentials{}, err
 	}
 
-	return jira.NewClientFromStore(store, site)
+	return auth.LoadSite(store, site)
 }
 
-// newBitbucketClient resolves the site alias from the --site flag (or default) and returns a Bitbucket client.
-func newBitbucketClient(cmd *cobra.Command) (*bitbucket.Client, error) {
-	store, err := auth.NewStore()
-	if err != nil {
-		return nil, err
-	}
-
+// resolveSiteAlias picks the site alias from --site, ATL_SITE, or the stored default.
+func resolveSiteAlias(cmd *cobra.Command, store auth.CredentialStore) (string, error) {
 	site, _ := cmd.Flags().GetString("site")
 	if site == "" {
 		site = os.Getenv("ATL_SITE")
 	}
 	if site == "" {
+		var err error
 		site, err = auth.GetDefaultSite(store)
 		if err != nil {
-			return nil, fmt.Errorf("no --site specified and no default site configured; run 'atl configure --site <name>' first")
+			return "", fmt.Errorf("no --site specified and no default site configured; run 'atl configure --site <name>' first")
 		}
 	}
+	return site, nil
+}
 
-	return bitbucket.NewClientFromStore(store, site)
+// newJiraClient returns a Jira client for the credentials selected by loadSiteCredentials.
+func newJiraClient(cmd *cobra.Command) (*jira.Client, error) {
+	creds, err := loadSiteCredentials(cmd)
+	if err != nil {
+		return nil, err
+	}
+	return jira.NewClient(creds), nil
+}
+
+// newBitbucketClient returns a Bitbucket client for the credentials selected by loadSiteCredentials.
+func newBitbucketClient(cmd *cobra.Command) (*bitbucket.Client, error) {
+	creds, err := loadSiteCredentials(cmd)
+	if err != nil {
+		return nil, err
+	}
+	return bitbucket.NewClient(creds), nil
 }
 
 // resolveBBWorkspace resolves the workspace from the --workspace flag and site configuration.
@@ -85,23 +101,7 @@ func newBitbucketClient(cmd *cobra.Command) (*bitbucket.Client, error) {
 func resolveBBWorkspace(cmd *cobra.Command) (string, error) {
 	flagWS, _ := cmd.Flags().GetString("workspace")
 
-	store, err := auth.NewStore()
-	if err != nil {
-		return "", err
-	}
-
-	site, _ := cmd.Flags().GetString("site")
-	if site == "" {
-		site = os.Getenv("ATL_SITE")
-	}
-	if site == "" {
-		site, err = auth.GetDefaultSite(store)
-		if err != nil {
-			return "", fmt.Errorf("no --site specified and no default site configured; run 'atl configure --site <name>' first")
-		}
-	}
-
-	creds, err := auth.LoadSite(store, site)
+	creds, err := loadSiteCredentials(cmd)
 	if err != nil {
 		return "", err
 	}
@@ -110,7 +110,7 @@ func resolveBBWorkspace(cmd *cobra.Command) (string, error) {
 	switch {
 	case flagWS != "" && savedWS != "":
 		if flagWS != savedWS {
-			return "", fmt.Errorf("workspace mismatch: --workspace %q does not match configured workspace %q for site %q", flagWS, savedWS, site)
+			return "", fmt.Errorf("workspace mismatch: --workspace %q does not match configured workspace %q", flagWS, savedWS)
 		}
 		return savedWS, nil
 	case flagWS != "":

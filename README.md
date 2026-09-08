@@ -56,6 +56,18 @@ https://id.atlassian.com/manage-profile/security/api-tokens
 
 認証情報は OS のキーリング（macOS Keychain / GNOME Keyring 等）に保存されます。キーリングが利用できない環境では `pass(1)` にフォールバックします。
 
+### 4. 環境変数で認証情報を渡す
+
+キーリングも `pass` も使えない環境（CI やサンドボックス化されたエージェント）では、以下の環境変数で認証情報を直接渡せます。3 つすべてが設定されている場合、キーリング / `pass` / `--site` / `ATL_SITE` は参照されません。一部だけ設定されている場合はエラーになります。
+
+| 環境変数 | 説明 |
+|---|---|
+| `ATL_BASE_URL` | Atlassian サイトの URL |
+| `ATL_EMAIL` | Atlassian アカウントのメールアドレス |
+| `ATL_API_TOKEN` | Jira 用 API トークン |
+| `ATL_BB_API_TOKEN` | Bitbucket 用 API トークン（省略可） |
+| `ATL_BB_WORKSPACE` | Bitbucket ワークスペース slug（省略可） |
+
 ## 複数サイトの管理
 
 設定済みサイトの一覧を確認:

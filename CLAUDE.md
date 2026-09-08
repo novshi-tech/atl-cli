@@ -52,6 +52,7 @@ skills/            ← Claude Code / Cursor 向けスキル定義（go embed で
 - OS Keyring（macOS Keychain / GNOME Keyring / Windows Credential Manager）→ `pass` コマンドへフォールバック
 - `ATL_CRED_BACKEND=boid-cli` を明示指定した場合のみ `BoidCLIStore`（`internal/auth/boid_cli.go`）を使う。`boid secret get/set/delete --namespace atl` を exec するだけの薄い実装で、boid の host_command として daemon container 内で atl を動かす用途向け（daemon 自身の UNIX socket は同一コンテナ内からは無認証の trusted transport なので、追加の認証情報は不要）。keyring も pass も使えない環境（GUI セッションも GPG 鍵も無い headless container）向けの第三の選択肢。auto-detect ではなく明示 opt-in にしているのは、`boid` が PATH にあるだけの普通のワークステーションで誤って選ばれないようにするため
 - 保存項目: `base-url`, `email`, `api-token`, `bb-api-token`（Bitbucket 専用）
+- 環境変数 `ATL_BASE_URL` / `ATL_EMAIL` / `ATL_API_TOKEN`（+ 任意で `ATL_BB_API_TOKEN` / `ATL_BB_WORKSPACE`）が揃っている場合はストアを一切参照せずそれを使う（`internal/auth/env.go`、`cmd/root.go` の `loadSiteCredentials`）。一部だけ設定されている場合はエラー。CI や boid サンドボックスなどキーリングも pass も無い環境向け
 - デフォルトサイトは `default-site` キーで管理
 - `atl configure --site <alias>` で初期設定
 
